@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- 🔑 LEARNING: viewport meta — Essential for mobile-first PWA.
+         width=device-width makes the viewport match the device width.
+         user-scalable=no prevents pinch-zoom (we want our own UX). -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+
+    <!-- 💡 CONCEPT: PWA meta tags — These make the app installable.
+         theme-color sets the browser chrome color on mobile.
+         apple-mobile-web-app-capable enables standalone mode on iOS. -->
+    <meta name="theme-color" content="#1a0a00" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <title>DoneRight — Cooking Timer</title>
+
+    <!-- 🔑 LEARNING: Google Fonts for pixel art aesthetic.
+         "Press Start 2P" is a pixel font that renders at 8px grid.
+         display=swap prevents FOIT (Flash of Invisible Text). -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- 💡 CONCEPT: PWA manifest link — Tells the browser this is an installable web app -->
+    <link rel="manifest" href="/manifest.json" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
