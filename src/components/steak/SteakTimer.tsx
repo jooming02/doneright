@@ -163,7 +163,7 @@ export const SteakTimer: React.FC<SteakTimerProps> = ({ plan, onDone, onBack }) 
         <PixelButton variant="secondary" onClick={onBack} disabled={hasStarted}>
           ←
         </PixelButton>
-        <h1 className="font-pixel text-xs text-gold-400">
+        <h1 className="font-heading text-lg text-hi">
           🥩 {plan.donenessLabel.toUpperCase()}
         </h1>
         <div className="w-10" /> {/* Spacer for alignment */}
@@ -183,9 +183,9 @@ export const SteakTimer: React.FC<SteakTimerProps> = ({ plan, onDone, onBack }) 
           // 🔑 LEARNING: Conditional UI for done state — When cooking is
           // complete, we show a celebration screen instead of a timer.
           <div className="flex flex-col items-center gap-pixel-4 animate-glow">
-            <div className="font-pixel text-2xl text-gold-400">✨</div>
-            <div className="font-pixel text-sm text-green-400">SERVE!</div>
-            <div className="font-pixel text-[8px] text-sear-300">
+            <div className="font-pixel text-2xl text-hi">✨</div>
+            <div className="font-pixel text-sm text-timer-ok">SERVE!</div>
+            <div className="font-pixel text-[8px] text-body-sub">
               Your steak is ready
             </div>
             <PixelButton variant="success" onClick={onDone}>
@@ -196,8 +196,8 @@ export const SteakTimer: React.FC<SteakTimerProps> = ({ plan, onDone, onBack }) 
           // Flip alert — urgent, eye-catching
           <div className="flex flex-col items-center gap-pixel-4 animate-blink">
             <div className="font-pixel text-4xl">🔄</div>
-            <div className="font-pixel text-lg text-yellow-400">FLIP!</div>
-            <div className="font-pixel text-[8px] text-sear-300">
+            <div className="font-pixel text-lg text-timer-warn">FLIP!</div>
+            <div className="font-pixel text-[8px] text-body-sub">
               Turn your steak now
             </div>
           </div>
@@ -219,24 +219,24 @@ export const SteakTimer: React.FC<SteakTimerProps> = ({ plan, onDone, onBack }) 
           {/* 🔑 LEARNING: Phase indicator — Shows which step we're on.
               Like a progress stepper in a wizard UI. */}
           <div className="flex justify-between items-center">
-            <span className="font-pixel text-[8px] text-sear-400">
+            <span className="font-pixel text-[8px] text-body-muted">
               Step {currentPhaseIndex + 1} of {plan.phases.length}
             </span>
-            <span className="font-pixel text-[8px] text-sear-400">
+            <span className="font-pixel text-[8px] text-body-muted">
               {currentPhase?.label}
             </span>
           </div>
 
           {/* Internal temp reference (steak only) */}
           {plan.internalTemp && (
-            <div className="text-[8px] text-sear-500 mt-pixel-1">
+            <div className="text-[8px] text-body-muted mt-pixel-1">
               Target: {plan.internalTemp.pullTempF[0]}-{plan.internalTemp.pullTempF[1]}°F pull | {plan.internalTemp.finalTempF}°F final
             </div>
           )}
 
           {/* Rest phase reminder */}
           {isRestPhase && (
-            <div className="font-pixel text-[8px] text-gold-400 mt-pixel-1 animate-blink">
+            <div className="font-pixel text-[8px] text-hi mt-pixel-1 animate-blink">
               ⚠ Remove from heat! Carryover cooking continues.
             </div>
           )}

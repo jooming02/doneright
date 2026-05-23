@@ -15,12 +15,14 @@
 
 import { useState, useCallback } from 'react';
 import type { Preferences } from '../types/cooking';
+import { DEFAULT_THEME_ID } from '../data/themes';
 
 // 💡 CONCEPT: Default preferences — Always provide defaults so the app
 // works even if localStorage is empty or corrupted.
 const DEFAULT_PREFERENCES: Preferences = {
   temperatureUnit: 'fahrenheit',
   lengthUnit: 'inch',
+  themeId: DEFAULT_THEME_ID,
 };
 
 const STORAGE_KEY = 'doneright-preferences';
