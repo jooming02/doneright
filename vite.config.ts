@@ -55,9 +55,9 @@ export default defineConfig({
       manifest: {
         name: 'DoneRight — Cooking Timer',
         short_name: 'DoneRight',
-        description: 'Pixel art cooking doneness timer PWA',
-        theme_color: '#1a0a00',
-        background_color: '#1a0a00',
+        description: 'Cooking doneness timer PWA',
+        theme_color: '#1a2f38',
+        background_color: '#1a2f38',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/',

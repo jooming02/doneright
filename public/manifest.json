@@ -1,12 +1,12 @@
 {
   "name": "DoneRight",
   "short_name": "DoneRight",
-  "description": "Pixel art cooking doneness timer PWA",
+  "description": "Cooking doneness timer PWA",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "theme_color": "#1a0a00",
-  "background_color": "#1a0a00",
+  "theme_color": "#1a2f38",
+  "background_color": "#1a2f38",
   "icons": [
     {
       "src": "/images/icon-192.svg",

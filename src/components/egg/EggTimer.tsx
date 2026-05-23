@@ -116,7 +116,7 @@ export const EggTimer: React.FC<EggTimerProps> = ({ plan, onDone, onBack }) => {
         <PixelButton variant="secondary" onClick={onBack} disabled={hasStarted}>
           ←
         </PixelButton>
-        <h1 className="font-pixel text-xs text-gold-400">
+        <h1 className="font-heading text-lg text-hi">
           🍳 {plan.donenessLabel.toUpperCase()}
         </h1>
         <div className="w-10" />
@@ -134,9 +134,9 @@ export const EggTimer: React.FC<EggTimerProps> = ({ plan, onDone, onBack }) => {
       <div className="flex-1 flex items-center justify-center">
         {isDonePhase ? (
           <div className="flex flex-col items-center gap-pixel-4 animate-glow">
-            <div className="font-pixel text-2xl text-gold-400">✨</div>
-            <div className="font-pixel text-sm text-green-400">DONE!</div>
-            <div className="font-pixel text-[8px] text-sear-300">
+            <div className="font-pixel text-2xl text-hi">✨</div>
+            <div className="font-pixel text-sm text-timer-ok">DONE!</div>
+            <div className="font-pixel text-[8px] text-body-sub">
               Your egg is ready
             </div>
             <PixelButton variant="success" onClick={onDone}>
@@ -146,8 +146,8 @@ export const EggTimer: React.FC<EggTimerProps> = ({ plan, onDone, onBack }) => {
         ) : isFlipPhase ? (
           <div className="flex flex-col items-center gap-pixel-4 animate-blink">
             <div className="font-pixel text-4xl">🔄</div>
-            <div className="font-pixel text-lg text-yellow-400">FLIP!</div>
-            <div className="font-pixel text-[8px] text-sear-300">
+            <div className="font-pixel text-lg text-timer-warn">FLIP!</div>
+            <div className="font-pixel text-[8px] text-body-sub">
               Turn your egg now
             </div>
           </div>
@@ -166,10 +166,10 @@ export const EggTimer: React.FC<EggTimerProps> = ({ plan, onDone, onBack }) => {
       <PixelCard>
         <div className="flex flex-col gap-pixel-2">
           <div className="flex justify-between items-center">
-            <span className="font-pixel text-[8px] text-sear-400">
+            <span className="font-pixel text-[8px] text-body-muted">
               Step {currentPhaseIndex + 1} of {plan.phases.length}
             </span>
-            <span className="font-pixel text-[8px] text-sear-400">
+            <span className="font-pixel text-[8px] text-body-muted">
               {currentPhase?.label}
             </span>
           </div>

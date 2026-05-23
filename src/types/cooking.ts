@@ -36,6 +36,7 @@ export type LengthUnit = 'cm' | 'inch';
 export interface Preferences {
   temperatureUnit: TemperatureUnit;
   lengthUnit: LengthUnit;
+  themeId: string;
 }
 
 /** A single doneness option for the setup screen */

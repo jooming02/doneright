@@ -15,7 +15,7 @@ interface PixelDonenessPreviewProps {
   /** Alt text for accessibility */
   alt: string;
   /** Size of the preview */
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
 // 🔑 LEARNING: SVG placeholder generator — Instead of loading external
@@ -108,6 +108,7 @@ export const PixelDonenessPreview: React.FC<PixelDonenessPreviewProps> = ({
     sm: 'w-12 h-12',
     md: 'w-20 h-20',
     lg: 'w-32 h-32',
+    xl: 'w-44 h-44',
   };
 
   // Determine food type from imageKey prefix
@@ -129,8 +130,8 @@ export const PixelDonenessPreview: React.FC<PixelDonenessPreviewProps> = ({
     <div
       className={`
         ${sizeClasses[size]}
-        border-pixel border-solid border-sear-600
-        bg-stove-950
+        border-pixel border-solid border-outline
+        bg-canvas
         p-pixel-1
         animate-glow
       `}

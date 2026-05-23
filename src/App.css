@@ -1,175 +1,127 @@
-/* 🔑 LEARNING: Global CSS for pixel art aesthetic.
-   This file contains styles that can't be achieved with Tailwind alone:
-   - CRT scanline overlay (pure CSS animation)
-   - Pixel-perfect image rendering
-   - Custom font fallback stack
-   - Global dark background
-   - Anti-aliasing overrides for pixel art
-
-   💡 CONCEPT: Tailwind + Custom CSS — Tailwind handles 90% of styling
-   through utility classes. But some effects (CSS animations, pseudo-elements,
-   global resets) need traditional CSS. That's fine — use the right tool. */
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────
+   THEME VARIABLES — defaults (Sunset Boulevard)
+   Overwritten at runtime by useTheme hook.
+   Only edit src/data/themes.ts to change or add themes.
+   ───────────────────────────────────────────────────────── */
+
+:root {
+  /* 60% — Canvas */
+  --canvas:      #120a04;
+  --surface:     #1c1008;
+  /* 30% — Structure */
+  --panel:       #281808;
+  --panel-hover: #301e10;
+  --outline:     #402a14;
+  --body:        #f8eacc;
+  --body-sub:    #a07850;
+  --body-muted:  #5a3e28;
+  /* 30% — Highlight (headings, active selection) */
+  --hi:          #f0a020;
+  /* 10% — CTA (primary buttons only) */
+  --cta:         #c84838;
+  --cta-dim:     #a83028;
+  --cta-ink:     #fff5f0;
+  --cta-ring:    #882018;
+  /* Timer states */
+  --timer-ok:        #4ade80;
+  --timer-warn:      #facc15;
+  --timer-danger:    #f87171;
+  --timer-critical:  #ef4444;
+}
 
 /* ─────────────────────────────────────────────────────────
    BASE RESETS
    ───────────────────────────────────────────────────────── */
 
 @layer base {
-  /* 🔑 LEARNING: Box-sizing reset — border-box means padding and border
-     are INCLUDED in the element's width/height, not added on top.
-     This makes sizing predictable: width: 100px + padding: 10px = still 100px total. */
   *,
   *::before,
   *::after {
     box-sizing: border-box;
   }
 
-  /* 🔑 LEARNING: Font smoothing override — "antialiased" makes text look
-     thinner and sharper on macOS. For our pixel font, we actually WANT
-     crisp edges (no sub-pixel rendering), so this helps. */
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    /* Background: deep dark brown (like a cast iron pan) */
-    background-color: #1a0a00;
-    color: #fde3de; /* stove-100 for readable text */
-    font-family: 'Press Start 2P', monospace;
-    /* 🔑 LEARNING: Prevent horizontal scroll on mobile —
-       overflow-x: hidden prevents accidental scroll from 100vw elements */
+    background-color: var(--canvas);
+    /* Atmospheric gradient — top glow in hi color, subtle CTA accent bottom-right.
+       color-mix adapts automatically when the theme switches. */
+    background-image:
+      radial-gradient(
+        ellipse 130% 70% at 50% -10%,
+        color-mix(in srgb, var(--hi) 35%, transparent),
+        transparent 68%
+      ),
+      radial-gradient(
+        ellipse 65% 55% at 95% 100%,
+        color-mix(in srgb, var(--cta) 25%, transparent),
+        transparent 65%
+      );
+    color: var(--body);
+    font-family: 'Outfit', sans-serif;
     overflow-x: hidden;
-    /* Prevent text selection during timer interaction */
     -webkit-user-select: none;
     user-select: none;
-    /* Prevent pull-to-refresh on mobile (interferes with timer) */
     overscroll-behavior-y: contain;
+    transition: background-color 0.4s ease, color 0.4s ease, background-image 0.4s ease;
   }
 
-  /* 🔑 LEARNING: Focus styles for accessibility — Keyboard users need
-     visible focus indicators. We style :focus-visible (keyboard only)
-     differently from :focus (mouse + keyboard) to avoid visual noise
-     for mouse users. */
   :focus-visible {
-    outline: 2px solid #facc15; /* gold-400 */
+    outline: 2px solid var(--cta);
     outline-offset: 2px;
   }
 }
 
 /* ─────────────────────────────────────────────────────────
-   PIXEL ART IMAGE RENDERING
+   GRAIN OVERLAY — subtle film texture for depth
    ───────────────────────────────────────────────────────── */
 
-@layer utilities {
-  /* 🔑 LEARNING: image-rendering: pixelated — This CSS property tells the
-     browser to use "nearest neighbor" scaling for images. Instead of
-     smoothing pixels when scaling up (bilinear/bicubic), it keeps the
-     blocky pixel look. Essential for pixel art! */
-  .pixel-render {
-    image-rendering: pixelated;
-    image-rendering: -moz-crisp-edges;
-    image-rendering: crisp-edges;
-  }
-}
-
-/* ─────────────────────────────────────────────────────────
-   CRT SCANLINE OVERLAY
-   🔑 LEARNING: CRT effect — Old CRT monitors had visible horizontal
-   scan lines where the electron beam drew each row. We recreate this
-   with a repeating linear-gradient that alternates between transparent
-   and semi-transparent black lines.
-   ───────────────────────────────────────────────────────── */
-
-/* The scanline overlay is a pseudo-element on the body.
-   This means it covers the entire viewport without any DOM changes. */
-body::after {
+html::before {
   content: '';
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none; /* 🔑 LEARNING: pointer-events: none — Lets clicks
-     pass through the overlay to the actual content. Without this,
-     the scanlines would block all interaction! */
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px 180px;
+  opacity: 0.04;
+  pointer-events: none;
   z-index: 9999;
-
-  /* 🔑 LEARNING: Repeating gradient for scanlines —
-     Each "scanline" is 2px tall:
-     - 1px of transparent (bright line)
-     - 1px of semi-transparent black (dark line / gap)
-     This creates the classic CRT look. */
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 1px,
-    rgba(0, 0, 0, 0.15) 1px,
-    rgba(0, 0, 0, 0.15) 2px
-  );
-
-  /* 🔑 LEARNING: Opacity on the overlay — Making the scanlines subtle
-     (opacity 0.5) so they don't obscure the content. Real CRT scanlines
-     were barely noticeable unless you looked closely. */
-  opacity: 0.5;
 }
 
 /* ─────────────────────────────────────────────────────────
-   CUSTOM PIXEL BORDER UTILITY
-   💡 CONCEPT: CSS custom properties for consistent borders.
-   In retro games, UI borders were always the same width and style.
-   We centralize this as a utility class for consistency.
+   SCROLLBAR
    ───────────────────────────────────────────────────────── */
 
-@layer components {
-  .pixel-border {
-    border: 4px solid;
-    border-image: none;
-    /* 🔑 LEARNING: box-shadow border alternative — For more complex
-       pixel borders (inset highlights, double borders), we could use
-       box-shadow. But for v0, a simple 4px solid border is enough. */
-  }
-}
-
-/* ─────────────────────────────────────────────────────────
-   SCROLLBAR STYLING (for desktop)
-   ───────────────────────────────────────────────────────── */
-
-/* 🔑 LEARNING: Custom scrollbar — Browsers have different default
-   scrollbar styles. For our dark pixel art theme, the default white
-   scrollbar looks jarring. We style it to match. */
-::-webkit-scrollbar {
-  width: 8px;
-}
+::-webkit-scrollbar { width: 6px; }
 
 ::-webkit-scrollbar-track {
-  background: #1a0a00;
+  background: var(--canvas);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #562f20; /* sear-900 */
-  border: 2px solid #1a0a00;
+  background: var(--outline);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #7b4124; /* sear-700 */
+  background: var(--hi);
 }
 
 /* ─────────────────────────────────────────────────────────
-   MOBILE-SPECIFIC ADJUSTMENTS
-   🔑 LEARNING: Safe area insets — Modern phones have notches and
-   rounded corners. env(safe-area-inset-*) gives us the safe area
-   boundaries so content doesn't get hidden behind the notch.
+   MOBILE SAFE AREAS
    ───────────────────────────────────────────────────────── */
 
 @supports (padding: env(safe-area-inset-bottom)) {
   body {
     padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
+    padding-left:   env(safe-area-inset-left);
+    padding-right:  env(safe-area-inset-right);
   }
 }
