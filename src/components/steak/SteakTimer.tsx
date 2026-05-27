@@ -195,7 +195,7 @@ export const SteakTimer: React.FC<SteakTimerProps> = ({ plan, onDone, onBack }) 
         ) : isFlipPhase ? (
           // Flip alert — urgent, eye-catching
           <div className="flex flex-col items-center gap-pixel-4 animate-blink">
-            <img src="/doneness/steak-flip.png" alt="Flip steak" className="w-48 h-auto rounded-lg" />
+            <img src="/images/steak-flip.png" alt="Flip steak" className="w-48 h-auto rounded-lg" />
             <div className="font-heading text-2xl text-timer-warn">FLIP!</div>
             <div className="font-pixel text-sm text-body-sub">
               Turn your steak now

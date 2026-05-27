@@ -20,16 +20,16 @@ interface DonenessPreviewProps {
 
 // 💡 CONCEPT: Real images for steak, SVG fallback for eggs —
 // Steak doneness is notoriously hard to communicate with a flat SVG.
-// We use AI-generated cartoon illustrations (stored in /public/doneness/)
+// We use AI-generated cartoon illustrations (stored in /public/images/)
 // for steak keys, and keep the lightweight SVG approach for eggs.
 
 /** Maps steak imageKey → public asset path */
 const STEAK_IMAGES: Record<string, string> = {
-  'steak-rare':        '/doneness/steak-rare.png',
-  'steak-medium-rare': '/doneness/steak-medium-rare.png',
-  'steak-medium':      '/doneness/steak-medium.png',
-  'steak-medium-well': '/doneness/steak-medium-well.png',
-  'steak-well-done':   '/doneness/steak-well-done.png',
+  'steak-rare':        '/images/steak-rare.png',
+  'steak-medium-rare': '/images/steak-medium-rare.png',
+  'steak-medium':      '/images/steak-medium.png',
+  'steak-medium-well': '/images/steak-medium-well.png',
+  'steak-well-done':   '/images/steak-well-done.png',
 };
 
 /** Color map for egg doneness */
