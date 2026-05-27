@@ -15,7 +15,7 @@ import { FOOD_PLUGINS } from './data/cooking-presets';
 import { calculateCookingPlan } from './utils/cooking-calculator';
 import { usePreferences } from './hooks/usePreferences';
 import { useTheme } from './hooks/useTheme';
-import { PixelButton } from './components/ui/PixelButton';
+import { Button } from './components/ui/Button';
 import { SteakSetup } from './components/steak/SteakSetup';
 import { SteakTimer } from './components/steak/SteakTimer';
 import { EggSetup } from './components/egg/EggSetup';
@@ -152,9 +152,9 @@ export default function App() {
           className="mt-auto pt-pixel-4 flex items-center justify-between animate-fade-up"
           style={{ animationDelay: '380ms' }}
         >
-          <PixelButton variant="secondary" onClick={() => setScreen('settings')}>
+          <Button variant="secondary" onClick={() => setScreen('settings')}>
             ⚙ SETTINGS
-          </PixelButton>
+          </Button>
           <span className="font-pixel text-[8px] text-body-muted">v0.1.0</span>
         </div>
       </div>

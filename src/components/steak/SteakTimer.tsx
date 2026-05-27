@@ -24,10 +24,10 @@ import { useTimer } from '../../hooks/useTimer';
 import { useAudioAlert } from '../../hooks/useAudioAlert';
 import { useWakeLock } from '../../hooks/useWakeLock';
 import { useNotification } from '../../hooks/useNotification';
-import { PixelCard } from '../ui/PixelCard';
-import { PixelButton } from '../ui/PixelButton';
-import { PixelTimer } from '../ui/PixelTimer';
-import { PixelProgress } from '../ui/PixelProgress';
+import { Card } from '../ui/Card';
+import { Button } from '../ui/Button';
+import { Timer } from '../ui/Timer';
+import { Progress } from '../ui/Progress';
 
 interface SteakTimerProps {
   plan: CookingPlan;
@@ -160,9 +160,9 @@ export const SteakTimer: React.FC<SteakTimerProps> = ({ plan, onDone, onBack }) 
     <div className="flex flex-col gap-pixel-4 p-pixel-4 max-w-md mx-auto min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <PixelButton variant="ghost" onClick={onBack} disabled={hasStarted}>
+        <Button variant="ghost" onClick={onBack} disabled={hasStarted}>
           ← Back
-        </PixelButton>
+        </Button>
         <h1 className="font-heading text-lg text-hi">
           🥩 {plan.donenessLabel.toUpperCase()}
         </h1>
@@ -170,7 +170,7 @@ export const SteakTimer: React.FC<SteakTimerProps> = ({ plan, onDone, onBack }) 
       </div>
 
       {/* Overall Progress */}
-      <PixelProgress
+      <Progress
         value={overallProgress}
         max={plan.totalDurationSeconds}
         segments={16}
@@ -188,14 +188,14 @@ export const SteakTimer: React.FC<SteakTimerProps> = ({ plan, onDone, onBack }) 
             <div className="font-pixel text-sm text-body-sub">
               Your steak is ready
             </div>
-            <PixelButton variant="primary" onClick={onDone}>
+            <Button variant="primary" onClick={onDone}>
               DONE
-            </PixelButton>
+            </Button>
           </div>
         ) : isFlipPhase ? (
           // Flip alert — urgent, eye-catching
           <div className="flex flex-col items-center gap-pixel-4 animate-blink">
-            <div className="font-pixel text-4xl">🔄</div>
+            <img src="/doneness/steak-flip.png" alt="Flip steak" className="w-48 h-auto rounded-lg" />
             <div className="font-heading text-2xl text-timer-warn">FLIP!</div>
             <div className="font-pixel text-sm text-body-sub">
               Turn your steak now
@@ -203,7 +203,7 @@ export const SteakTimer: React.FC<SteakTimerProps> = ({ plan, onDone, onBack }) 
           </div>
         ) : (
           // Normal timer display
-          <PixelTimer
+          <Timer
             remaining={timer.remaining}
             total={timer.total}
             isRunning={timer.isRunning}
@@ -214,7 +214,7 @@ export const SteakTimer: React.FC<SteakTimerProps> = ({ plan, onDone, onBack }) 
       </div>
 
       {/* Phase Info */}
-      <PixelCard>
+      <Card>
         <div className="flex flex-col gap-pixel-2">
           {/* 🔑 LEARNING: Phase indicator — Shows which step we're on.
               Like a progress stepper in a wizard UI. */}
@@ -241,37 +241,37 @@ export const SteakTimer: React.FC<SteakTimerProps> = ({ plan, onDone, onBack }) 
             </div>
           )}
         </div>
-      </PixelCard>
+      </Card>
 
       {/* Control Buttons */}
       <div className="flex gap-pixel-2">
         {!hasStarted ? (
-          <PixelButton
+          <Button
             variant="primary"
             className="flex-1 py-pixel-3"
             onClick={handleStart}
           >
             ▶ START
-          </PixelButton>
+          </Button>
         ) : (
           <>
             {timer.isRunning ? (
-              <PixelButton
+              <Button
                 variant="secondary"
                 className="flex-1 py-pixel-3"
                 onClick={handlePause}
               >
                 ⏸ PAUSE
-              </PixelButton>
+              </Button>
             ) : (
-              <PixelButton
+              <Button
                 variant="primary"
                 className="flex-1 py-pixel-3"
                 onClick={handleResume}
                 disabled={isDonePhase || isInstantPhase}
               >
                 ▶ RESUME
-              </PixelButton>
+              </Button>
             )}
           </>
         )}

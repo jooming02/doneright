@@ -14,8 +14,8 @@ import { AnimatePresence, motion } from 'motion/react';
 import useEmblaCarousel from 'embla-carousel-react';
 import type { SteakDoneness, SteakThickness, CookingParams } from '../../types/cooking';
 import { STEAK_THICKNESS_LABELS, STEAK_DONENESS_OPTIONS } from '../../data/cooking-presets';
-import { PixelButton } from '../ui/PixelButton';
-import { PixelDonenessPreview } from '../ui/PixelDonenessPreview';
+import { Button } from '../ui/Button';
+import { DonenessPreview } from '../ui/DonenessPreview';
 
 interface SteakSetupProps {
   onStart: (params: CookingParams) => void;
@@ -97,7 +97,7 @@ export const SteakSetup: React.FC<SteakSetupProps> = ({ onStart, onBack }) => {
     <div className="flex flex-col min-h-screen px-pixel-4 pt-pixel-4 pb-pixel-6 max-w-sm mx-auto">
       {/* Header */}
       <div className="flex items-center gap-pixel-3 mb-pixel-6">
-        <PixelButton variant="ghost" onClick={handleBack}>← Back</PixelButton>
+        <Button variant="ghost" onClick={handleBack}>← Back</Button>
         <h1 className="font-heading text-xl text-hi">
           🥩 {step === 'thickness' ? 'Steak' : STEAK_THICKNESS_LABELS[thickness!]}
         </h1>
@@ -153,7 +153,7 @@ export const SteakSetup: React.FC<SteakSetupProps> = ({ onStart, onBack }) => {
                       ${i === selectedIndex ? 'opacity-100 scale-100' : 'opacity-40 scale-95'}
                     `}
                   >
-                    <PixelDonenessPreview imageKey={option.imageKey} alt={option.label} size="xl" />
+                    <DonenessPreview imageKey={option.imageKey} alt={option.label} size="xl" />
                     <div className="text-center">
                       <div className={`font-heading text-lg ${i === selectedIndex ? 'text-hi' : 'text-body-sub'}`}>
                         {option.label}
@@ -166,13 +166,13 @@ export const SteakSetup: React.FC<SteakSetupProps> = ({ onStart, onBack }) => {
             </div>
 
             {/* Start — centred slide is always the selection, so always enabled */}
-            <PixelButton
+            <Button
               variant="primary"
               className="w-full py-pixel-4 text-sm mt-pixel-4"
               onClick={handleStart}
             >
               ▶ START COOKING
-            </PixelButton>
+            </Button>
           </motion.div>
         )}
 

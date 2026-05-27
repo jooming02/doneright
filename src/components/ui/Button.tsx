@@ -2,7 +2,7 @@ import React from 'react';
 
 type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'ghost';
 
-interface PixelButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   children: React.ReactNode;
 }
@@ -19,7 +19,7 @@ const VARIANT_STYLES: Record<ButtonVariant, string> = {
   ghost:     'bg-transparent border-transparent text-body-muted hover:text-body-sub',
 };
 
-export const PixelButton: React.FC<PixelButtonProps> = ({
+export const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
   children,
   className = '',

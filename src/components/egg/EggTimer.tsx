@@ -2,8 +2,8 @@
 // Eggs have fewer phases than steak (no rest period for most methods),
 // so the timer flow is simpler. But the same phase-based architecture applies.
 //
-// 💡 CONCEPT: Component reuse — We reuse the same PixelTimer, PixelProgress,
-// and PixelCard components. The timer logic (useTimer hook) is also shared.
+// 💡 CONCEPT: Component reuse — We reuse the same Timer, Progress,
+// and Card components. The timer logic (useTimer hook) is also shared.
 // This is the power of good abstractions — write once, use everywhere.
 
 import React, { useState, useCallback, useRef } from 'react';
@@ -12,10 +12,10 @@ import { useTimer } from '../../hooks/useTimer';
 import { useAudioAlert } from '../../hooks/useAudioAlert';
 import { useWakeLock } from '../../hooks/useWakeLock';
 import { useNotification } from '../../hooks/useNotification';
-import { PixelCard } from '../ui/PixelCard';
-import { PixelButton } from '../ui/PixelButton';
-import { PixelTimer } from '../ui/PixelTimer';
-import { PixelProgress } from '../ui/PixelProgress';
+import { Card } from '../ui/Card';
+import { Button } from '../ui/Button';
+import { Timer } from '../ui/Timer';
+import { Progress } from '../ui/Progress';
 
 interface EggTimerProps {
   plan: CookingPlan;
@@ -113,9 +113,9 @@ export const EggTimer: React.FC<EggTimerProps> = ({ plan, onDone, onBack }) => {
     <div className="flex flex-col gap-pixel-4 p-pixel-4 max-w-md mx-auto min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <PixelButton variant="ghost" onClick={onBack} disabled={hasStarted}>
+        <Button variant="ghost" onClick={onBack} disabled={hasStarted}>
           ← Back
-        </PixelButton>
+        </Button>
         <h1 className="font-heading text-lg text-hi">
           🍳 {plan.donenessLabel.toUpperCase()}
         </h1>
@@ -123,7 +123,7 @@ export const EggTimer: React.FC<EggTimerProps> = ({ plan, onDone, onBack }) => {
       </div>
 
       {/* Overall Progress */}
-      <PixelProgress
+      <Progress
         value={overallProgress}
         max={plan.totalDurationSeconds}
         segments={12}
@@ -139,9 +139,9 @@ export const EggTimer: React.FC<EggTimerProps> = ({ plan, onDone, onBack }) => {
             <div className="font-pixel text-sm text-body-sub">
               Your egg is ready
             </div>
-            <PixelButton variant="primary" onClick={onDone}>
+            <Button variant="primary" onClick={onDone}>
               DONE
-            </PixelButton>
+            </Button>
           </div>
         ) : isFlipPhase ? (
           <div className="flex flex-col items-center gap-pixel-4 animate-blink">
@@ -152,7 +152,7 @@ export const EggTimer: React.FC<EggTimerProps> = ({ plan, onDone, onBack }) => {
             </div>
           </div>
         ) : (
-          <PixelTimer
+          <Timer
             remaining={timer.remaining}
             total={timer.total}
             isRunning={timer.isRunning}
@@ -163,7 +163,7 @@ export const EggTimer: React.FC<EggTimerProps> = ({ plan, onDone, onBack }) => {
       </div>
 
       {/* Phase Info */}
-      <PixelCard>
+      <Card>
         <div className="flex flex-col gap-pixel-2">
           <div className="flex justify-between items-center">
             <span className="font-pixel text-xs text-body-muted">
@@ -174,37 +174,37 @@ export const EggTimer: React.FC<EggTimerProps> = ({ plan, onDone, onBack }) => {
             </span>
           </div>
         </div>
-      </PixelCard>
+      </Card>
 
       {/* Control Buttons */}
       <div className="flex gap-pixel-2">
         {!hasStarted ? (
-          <PixelButton
+          <Button
             variant="primary"
             className="flex-1 py-pixel-3"
             onClick={handleStart}
           >
             ▶ START
-          </PixelButton>
+          </Button>
         ) : (
           <>
             {timer.isRunning ? (
-              <PixelButton
+              <Button
                 variant="secondary"
                 className="flex-1 py-pixel-3"
                 onClick={handlePause}
               >
                 ⏸ PAUSE
-              </PixelButton>
+              </Button>
             ) : (
-              <PixelButton
+              <Button
                 variant="primary"
                 className="flex-1 py-pixel-3"
                 onClick={handleResume}
                 disabled={isDonePhase || isInstantPhase}
               >
                 ▶ RESUME
-              </PixelButton>
+              </Button>
             )}
           </>
         )}

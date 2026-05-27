@@ -1,8 +1,8 @@
 import React from 'react';
 import type { Preferences, TemperatureUnit, LengthUnit } from '../types/cooking';
 import { THEMES } from '../data/themes';
-import { PixelCard } from './ui/PixelCard';
-import { PixelButton } from './ui/PixelButton';
+import { Card } from './ui/Card';
+import { Button } from './ui/Button';
 
 interface SettingsProps {
   preferences: Preferences;
@@ -25,12 +25,12 @@ export const Settings: React.FC<SettingsProps> = ({ preferences, onUpdate, onBac
     <div className="flex flex-col gap-pixel-4 p-pixel-4 max-w-md mx-auto">
       {/* Header */}
       <div className="flex items-center gap-pixel-3">
-        <PixelButton variant="secondary" onClick={onBack}>←</PixelButton>
+        <Button variant="secondary" onClick={onBack}>←</Button>
         <h1 className="font-heading text-xl text-hi">⚙ Settings</h1>
       </div>
 
       {/* Theme picker */}
-      <PixelCard title="THEME">
+      <Card title="THEME">
         <div className="grid grid-cols-2 gap-pixel-2">
           {THEMES.map((theme) => {
             const isActive = preferences.themeId === theme.id;
@@ -70,10 +70,10 @@ export const Settings: React.FC<SettingsProps> = ({ preferences, onUpdate, onBac
             );
           })}
         </div>
-      </PixelCard>
+      </Card>
 
       {/* Temperature unit */}
-      <PixelCard title="TEMPERATURE">
+      <Card title="TEMPERATURE">
         <div className="flex gap-pixel-2">
           {tempOptions.map((opt) => (
             <button
@@ -93,10 +93,10 @@ export const Settings: React.FC<SettingsProps> = ({ preferences, onUpdate, onBac
             </button>
           ))}
         </div>
-      </PixelCard>
+      </Card>
 
       {/* Length unit */}
-      <PixelCard title="LENGTH">
+      <Card title="LENGTH">
         <div className="flex gap-pixel-2">
           {lengthOptions.map((opt) => (
             <button
@@ -116,16 +116,16 @@ export const Settings: React.FC<SettingsProps> = ({ preferences, onUpdate, onBac
             </button>
           ))}
         </div>
-      </PixelCard>
+      </Card>
 
       {/* About */}
-      <PixelCard title="ABOUT">
+      <Card title="ABOUT">
         <div className="flex flex-col gap-pixel-1 text-[8px] text-body-muted">
           <span className="font-pixel">DoneRight v0.1.0</span>
           <span className="font-pixel">A cooking timer PWA</span>
           <span className="font-pixel">60-30-10 color system</span>
         </div>
-      </PixelCard>
+      </Card>
     </div>
   );
 };

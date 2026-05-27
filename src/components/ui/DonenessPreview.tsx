@@ -9,7 +9,7 @@
 
 import React from 'react';
 
-interface PixelDonenessPreviewProps {
+interface DonenessPreviewProps {
   /** Image key from the doneness option (e.g., 'steak-rare', 'egg-soft-boiled') */
   imageKey: string;
   /** Alt text for accessibility */
@@ -68,14 +68,14 @@ function EggSVG({ colors, isBoiled }: { colors: { white: string; yolk: string };
 }
 
 /**
- * PixelDonenessPreview — Shows a pixel art preview of the selected doneness.
+ * DonenessPreview — Shows a pixel art preview of the selected doneness.
  *
  * 💡 CONCEPT: Component composition over conditional rendering — Instead of
  * one giant component with lots of ifs, we compose small SVG components.
  * Each food type has its own SVG generator, and this component just picks
  * the right one based on the imageKey.
  */
-export const PixelDonenessPreview: React.FC<PixelDonenessPreviewProps> = ({
+export const DonenessPreview: React.FC<DonenessPreviewProps> = ({
   imageKey,
   alt,
   size = 'md',

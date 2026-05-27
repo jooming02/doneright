@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface PixelCardProps {
+interface CardProps {
   children: React.ReactNode;
   title?: string;
   className?: string;
@@ -8,7 +8,7 @@ interface PixelCardProps {
   hoverable?: boolean;
 }
 
-export const PixelCard: React.FC<PixelCardProps> = ({
+export const Card: React.FC<CardProps> = ({
   children,
   title,
   className = '',
