@@ -113,8 +113,8 @@ export const EggTimer: React.FC<EggTimerProps> = ({ plan, onDone, onBack }) => {
     <div className="flex flex-col gap-pixel-4 p-pixel-4 max-w-md mx-auto min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <PixelButton variant="secondary" onClick={onBack} disabled={hasStarted}>
-          ←
+        <PixelButton variant="ghost" onClick={onBack} disabled={hasStarted}>
+          ← Back
         </PixelButton>
         <h1 className="font-heading text-lg text-hi">
           🍳 {plan.donenessLabel.toUpperCase()}
@@ -135,19 +135,19 @@ export const EggTimer: React.FC<EggTimerProps> = ({ plan, onDone, onBack }) => {
         {isDonePhase ? (
           <div className="flex flex-col items-center gap-pixel-4 animate-glow">
             <div className="font-pixel text-2xl text-hi">✨</div>
-            <div className="font-pixel text-sm text-timer-ok">DONE!</div>
-            <div className="font-pixel text-[8px] text-body-sub">
+            <div className="font-heading text-2xl text-timer-ok">DONE!</div>
+            <div className="font-pixel text-sm text-body-sub">
               Your egg is ready
             </div>
-            <PixelButton variant="success" onClick={onDone}>
+            <PixelButton variant="primary" onClick={onDone}>
               DONE
             </PixelButton>
           </div>
         ) : isFlipPhase ? (
           <div className="flex flex-col items-center gap-pixel-4 animate-blink">
             <div className="font-pixel text-4xl">🔄</div>
-            <div className="font-pixel text-lg text-timer-warn">FLIP!</div>
-            <div className="font-pixel text-[8px] text-body-sub">
+            <div className="font-heading text-2xl text-timer-warn">FLIP!</div>
+            <div className="font-pixel text-sm text-body-sub">
               Turn your egg now
             </div>
           </div>
@@ -166,10 +166,10 @@ export const EggTimer: React.FC<EggTimerProps> = ({ plan, onDone, onBack }) => {
       <PixelCard>
         <div className="flex flex-col gap-pixel-2">
           <div className="flex justify-between items-center">
-            <span className="font-pixel text-[8px] text-body-muted">
+            <span className="font-pixel text-xs text-body-muted">
               Step {currentPhaseIndex + 1} of {plan.phases.length}
             </span>
-            <span className="font-pixel text-[8px] text-body-muted">
+            <span className="font-pixel text-xs text-body-sub">
               {currentPhase?.label}
             </span>
           </div>
@@ -180,7 +180,7 @@ export const EggTimer: React.FC<EggTimerProps> = ({ plan, onDone, onBack }) => {
       <div className="flex gap-pixel-2">
         {!hasStarted ? (
           <PixelButton
-            variant="success"
+            variant="primary"
             className="flex-1 py-pixel-3"
             onClick={handleStart}
           >
@@ -198,7 +198,7 @@ export const EggTimer: React.FC<EggTimerProps> = ({ plan, onDone, onBack }) => {
               </PixelButton>
             ) : (
               <PixelButton
-                variant="success"
+                variant="primary"
                 className="flex-1 py-pixel-3"
                 onClick={handleResume}
                 disabled={isDonePhase || isInstantPhase}

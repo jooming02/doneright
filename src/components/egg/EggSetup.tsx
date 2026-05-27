@@ -100,7 +100,7 @@ export const EggSetup: React.FC<EggSetupProps> = ({ onStart, onBack }) => {
     <div className="flex flex-col min-h-screen px-pixel-4 pt-pixel-4 pb-pixel-6 max-w-sm mx-auto">
       {/* Header */}
       <div className="flex items-center gap-pixel-3 mb-pixel-6">
-        <PixelButton variant="secondary" onClick={handleBack}>←</PixelButton>
+        <PixelButton variant="ghost" onClick={handleBack}>← Back</PixelButton>
         <h1 className="font-heading text-xl text-hi">
           🍳 {step === 'method' ? 'Eggs' : (method === 'boiled' ? 'Boiled' : 'Fried')}
         </h1>
@@ -111,8 +111,8 @@ export const EggSetup: React.FC<EggSetupProps> = ({ onStart, onBack }) => {
         {/* ─── STEP 1: Method ───────────────────────────────── */}
         {step === 'method' && (
           <motion.div key="method" {...stepTransition} className="flex flex-col gap-pixel-3 flex-1">
-            <p className="font-pixel text-[8px] text-body-muted mb-pixel-2 tracking-widest">
-              HOW ARE YOU COOKING?
+            <p className="font-heading text-base text-body-sub mb-pixel-4">
+              How are you cooking?
             </p>
             {/* 🔑 LEARNING: flex-1 on each button + flex-col on parent = equal-height
                 buttons that fill the remaining screen. With 2 methods, each card
@@ -141,8 +141,8 @@ export const EggSetup: React.FC<EggSetupProps> = ({ onStart, onBack }) => {
         {/* ─── STEP 2: Doneness carousel ────────────────────── */}
         {step === 'doneness' && (
           <motion.div key="doneness" {...stepTransition} className="flex flex-col flex-1">
-            <p className="font-pixel text-[8px] text-body-muted mb-pixel-4 tracking-widest">
-              SWIPE TO PICK DONENESS
+            <p className="font-heading text-base text-body-sub mb-pixel-4">
+              Pick your doneness
             </p>
 
             <div className="overflow-hidden flex-1 flex flex-col justify-center" ref={emblaRef}>
@@ -158,10 +158,10 @@ export const EggSetup: React.FC<EggSetupProps> = ({ onStart, onBack }) => {
                   >
                     <PixelDonenessPreview imageKey={option.imageKey} alt={option.label} size="xl" />
                     <div className="text-center">
-                      <div className={`font-pixel text-xs ${i === selectedIndex ? 'text-hi' : 'text-body-sub'}`}>
+                      <div className={`font-heading text-lg ${i === selectedIndex ? 'text-hi' : 'text-body-sub'}`}>
                         {option.label}
                       </div>
-                      <div className="font-pixel text-[8px] text-body-muted mt-1">{option.description}</div>
+                      <div className="font-pixel text-xs text-body-muted mt-1">{option.description}</div>
                     </div>
                   </div>
                 ))}

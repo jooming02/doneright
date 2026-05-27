@@ -149,7 +149,7 @@ export default function App() {
 
         {/* ── Footer row — settings left, version right ── */}
         <div
-          className="pt-pixel-4 flex items-center justify-between animate-fade-up"
+          className="mt-auto pt-pixel-4 flex items-center justify-between animate-fade-up"
           style={{ animationDelay: '380ms' }}
         >
           <PixelButton variant="secondary" onClick={() => setScreen('settings')}>

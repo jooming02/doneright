@@ -1,6 +1,6 @@
 import React from 'react';
 
-type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger';
+type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'ghost';
 
 interface PixelButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -16,6 +16,7 @@ const VARIANT_STYLES: Record<ButtonVariant, string> = {
   secondary: 'bg-panel border-outline border-l-2 border-l-hi text-body-sub hover:bg-panel-hover hover:border-outline hover:border-l-hi',
   success:   'bg-green-700 border-green-900 text-green-100 hover:bg-green-600 hover:border-green-800',
   danger:    'bg-red-700   border-red-900   text-red-100   hover:bg-red-600   hover:border-red-800',
+  ghost:     'bg-transparent border-transparent text-body-muted hover:text-body-sub',
 };
 
 export const PixelButton: React.FC<PixelButtonProps> = ({

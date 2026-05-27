@@ -18,20 +18,18 @@ interface PixelDonenessPreviewProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
-// 🔑 LEARNING: SVG placeholder generator — Instead of loading external
-// PNG files, we generate simple SVG graphics inline. This has advantages:
-// 1. Zero network requests — instant display
-// 2. Infinitely scalable — no pixelation (well, we WANT pixelation here)
-// 3. Customizable at runtime — we can change colors based on state
-// 4. No build step needed — no file copying or asset pipeline
+// 💡 CONCEPT: Real images for steak, SVG fallback for eggs —
+// Steak doneness is notoriously hard to communicate with a flat SVG.
+// We use AI-generated cartoon illustrations (stored in /public/doneness/)
+// for steak keys, and keep the lightweight SVG approach for eggs.
 
-/** Color map for steak doneness — from raw (red) to well-done (brown) */
-const STEAK_COLORS: Record<string, { outside: string; inside: string }> = {
-  'steak-rare': { outside: '#8B4513', inside: '#DC143C' },
-  'steak-medium-rare': { outside: '#8B4513', inside: '#E25822' },
-  'steak-medium': { outside: '#8B4513', inside: '#CD853F' },
-  'steak-medium-well': { outside: '#8B4513', inside: '#A0522D' },
-  'steak-well-done': { outside: '#6B3410', inside: '#654321' },
+/** Maps steak imageKey → public asset path */
+const STEAK_IMAGES: Record<string, string> = {
+  'steak-rare':        '/doneness/steak-rare.png',
+  'steak-medium-rare': '/doneness/steak-medium-rare.png',
+  'steak-medium':      '/doneness/steak-medium.png',
+  'steak-medium-well': '/doneness/steak-medium-well.png',
+  'steak-well-done':   '/doneness/steak-well-done.png',
 };
 
 /** Color map for egg doneness */
@@ -44,28 +42,6 @@ const EGG_COLORS: Record<string, { white: string; yolk: string }> = {
   'egg-over-medium': { white: '#F0E68C', yolk: '#FFA500' },
   'egg-over-hard': { white: '#DAA520', yolk: '#B8860B' },
 };
-
-/**
- * Generate an SVG placeholder for a steak doneness level.
- * Shows a cross-section: seared outside + colored inside.
- */
-function SteakSVG({ colors }: { colors: { outside: string; inside: string } }): React.ReactElement {
-  return (
-    <svg viewBox="0 0 64 64" className="w-full h-full" style={{ imageRendering: 'pixelated' }}>
-      {/* 🔑 LEARNING: SVG for pixel art — Using rect elements on a 64x64 grid
-          creates a chunky, pixelated look. The style imageRendering: pixelated
-          tells the browser to use nearest-neighbor scaling, preserving the
-          blocky aesthetic at any display size. */}
-      {/* Outer (seared) ring */}
-      <rect x="8" y="16" width="48" height="32" rx="4" fill={colors.outside} />
-      {/* Inner (doneness) area */}
-      <rect x="14" y="20" width="36" height="24" rx="2" fill={colors.inside} />
-      {/* Grill marks */}
-      <rect x="12" y="28" width="40" height="2" fill="#2D1810" opacity="0.3" />
-      <rect x="12" y="36" width="40" height="2" fill="#2D1810" opacity="0.3" />
-    </svg>
-  );
-}
 
 /**
  * Generate an SVG placeholder for an egg doneness level.
@@ -115,10 +91,10 @@ export const PixelDonenessPreview: React.FC<PixelDonenessPreviewProps> = ({
   const isSteak = imageKey.startsWith('steak');
   const isBoiled = imageKey.startsWith('egg-soft') || imageKey.startsWith('egg-medium-b') || imageKey.startsWith('egg-hard');
 
-  const renderSVG = () => {
+  const renderContent = () => {
     if (isSteak) {
-      const colors = STEAK_COLORS[imageKey] ?? STEAK_COLORS['steak-medium'] ?? { outside: '#8B4513', inside: '#CD853F' };
-      return <SteakSVG colors={colors} />;
+      const src = STEAK_IMAGES[imageKey] ?? STEAK_IMAGES['steak-medium'];
+      return <img src={src} alt={alt} className="w-full h-full object-cover" />;
     }
 
     const eggKey = imageKey as string;
@@ -138,7 +114,7 @@ export const PixelDonenessPreview: React.FC<PixelDonenessPreviewProps> = ({
       role="img"
       aria-label={alt}
     >
-      {renderSVG()}
+      {renderContent()}
     </div>
   );
 };
