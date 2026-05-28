@@ -18,12 +18,7 @@ interface DonenessPreviewProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
-// 💡 CONCEPT: Real images for steak, SVG fallback for eggs —
-// Steak doneness is notoriously hard to communicate with a flat SVG.
-// We use AI-generated cartoon illustrations (stored in /public/images/)
-// for steak keys, and keep the lightweight SVG approach for eggs.
-
-/** Maps steak imageKey → public asset path */
+/** Maps imageKey → public asset path */
 const STEAK_IMAGES: Record<string, string> = {
   'steak-rare':        '/images/steak-rare.png',
   'steak-medium-rare': '/images/steak-medium-rare.png',
@@ -31,41 +26,6 @@ const STEAK_IMAGES: Record<string, string> = {
   'steak-medium-well': '/images/steak-medium-well.png',
   'steak-well-done':   '/images/steak-well-done.png',
 };
-
-/** Color map for egg doneness */
-const EGG_COLORS: Record<string, { white: string; yolk: string }> = {
-  'egg-soft-boiled': { white: '#FAFAFA', yolk: '#FFD700' },
-  'egg-medium-boiled': { white: '#FAFAFA', yolk: '#FFA500' },
-  'egg-hard-boiled': { white: '#FAFAFA', yolk: '#FFBF00' },
-  'egg-sunny-side-up': { white: '#FAFAFA', yolk: '#FFD700' },
-  'egg-over-easy': { white: '#F5F5DC', yolk: '#FFD700' },
-  'egg-over-medium': { white: '#F0E68C', yolk: '#FFA500' },
-  'egg-over-hard': { white: '#DAA520', yolk: '#B8860B' },
-};
-
-/**
- * Generate an SVG placeholder for an egg doneness level.
- * Shows top-down view: egg white + yolk center.
- */
-function EggSVG({ colors, isBoiled }: { colors: { white: string; yolk: string }; isBoiled: boolean }): React.ReactElement {
-  return (
-    <svg viewBox="0 0 64 64" className="w-full h-full" style={{ imageRendering: 'pixelated' }}>
-      {isBoiled ? (
-        // Boiled egg: oval with cross-section showing yolk
-        <>
-          <ellipse cx="32" cy="32" rx="22" ry="26" fill={colors.white} />
-          <ellipse cx="32" cy="32" rx="10" ry="10" fill={colors.yolk} />
-        </>
-      ) : (
-        // Fried egg: irregular white with yolk
-        <>
-          <ellipse cx="32" cy="34" rx="26" ry="22" fill={colors.white} />
-          <ellipse cx="32" cy="30" rx="10" ry="9" fill={colors.yolk} />
-        </>
-      )}
-    </svg>
-  );
-}
 
 /**
  * DonenessPreview — Shows a pixel art preview of the selected doneness.
@@ -87,20 +47,7 @@ export const DonenessPreview: React.FC<DonenessPreviewProps> = ({
     xl: 'w-44 h-44',
   };
 
-  // Determine food type from imageKey prefix
-  const isSteak = imageKey.startsWith('steak');
-  const isBoiled = imageKey.startsWith('egg-soft') || imageKey.startsWith('egg-medium-b') || imageKey.startsWith('egg-hard');
-
-  const renderContent = () => {
-    if (isSteak) {
-      const src = STEAK_IMAGES[imageKey] ?? STEAK_IMAGES['steak-medium'];
-      return <img src={src} alt={alt} className="w-full h-full object-cover" />;
-    }
-
-    const eggKey = imageKey as string;
-    const colors = EGG_COLORS[eggKey] ?? EGG_COLORS['egg-soft-boiled'] ?? { white: '#FAFAFA', yolk: '#FFD700' };
-    return <EggSVG colors={colors} isBoiled={isBoiled} />;
-  };
+  const src = STEAK_IMAGES[imageKey] ?? STEAK_IMAGES['steak-medium'];
 
   return (
     <div
@@ -114,7 +61,7 @@ export const DonenessPreview: React.FC<DonenessPreviewProps> = ({
       role="img"
       aria-label={alt}
     >
-      {renderContent()}
+      <img src={src} alt={alt} className="w-full h-full object-cover" />
     </div>
   );
 };

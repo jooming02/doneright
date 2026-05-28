@@ -4,25 +4,13 @@
 // at compile time instead of runtime.
 
 /** All supported food categories — adding a new food starts here */
-export type FoodCategory = 'steak' | 'egg';
+export type FoodCategory = 'steak';
 
 /** Steak doneness levels, from least to most cooked */
 export type SteakDoneness = 'rare' | 'medium-rare' | 'medium' | 'medium-well' | 'well-done';
 
-/** Egg cooking methods — each has different doneness options */
-export type EggMethod = 'boiled' | 'fried';
-
-/** Boiled egg doneness — determined by cook time in boiling water */
-export type BoiledDoneness = 'soft-boiled' | 'medium-boiled' | 'hard-boiled';
-
-/** Fried egg doneness — determined by cook time and whether to flip */
-export type FriedDoneness = 'sunny-side-up' | 'over-easy' | 'over-medium' | 'over-hard';
-
-/** Union of all egg doneness types */
-export type EggDoneness = BoiledDoneness | FriedDoneness;
-
-/** All doneness types across foods — used in generic components */
-export type Doneness = SteakDoneness | EggDoneness;
+/** All doneness types — currently steak only */
+export type Doneness = SteakDoneness;
 
 /** Steak thickness options in both metric and imperial */
 export type SteakThickness = '0.5in' | '0.75in' | '1in' | '1.5in' | '2in';
@@ -88,10 +76,8 @@ export interface FoodPlugin {
   calculateTime(params: CookingParams): CookingPlan;
 }
 
-/** Parameters needed to calculate cooking time — varies by food */
-export type CookingParams =
-  | { food: 'steak'; thickness: SteakThickness; doneness: SteakDoneness }
-  | { food: 'egg'; method: EggMethod; doneness: EggDoneness };
+/** Parameters needed to calculate cooking time */
+export type CookingParams = { food: 'steak'; thickness: SteakThickness; doneness: SteakDoneness };
 
 /** Timer state returned by useTimer hook */
 export interface TimerState {

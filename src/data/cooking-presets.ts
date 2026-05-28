@@ -6,8 +6,6 @@
 import type {
   SteakDoneness,
   SteakThickness,
-  BoiledDoneness,
-  FriedDoneness,
   DonenessOption,
   TemperatureRange,
   FoodPlugin,
@@ -83,47 +81,6 @@ export const STEAK_DONENESS_OPTIONS: DonenessOption[] = [
   { id: 'medium', label: 'Medium', description: 'Pink center, firm', imageKey: 'steak-medium' },
   { id: 'medium-well', label: 'Med Well', description: 'Slight pink, mostly brown', imageKey: 'steak-medium-well' },
   { id: 'well-done', label: 'Well Done', description: 'Fully brown throughout', imageKey: 'steak-well-done' },
-];
-
-// ─────────────────────────────────────────────────────────
-// EGG DATA
-// ─────────────────────────────────────────────────────────
-
-/** Boiled egg cook times in minutes from boiling water */
-export const BOILED_EGG_TIMES: Record<BoiledDoneness, number> = {
-  'soft-boiled': 6,
-  'medium-boiled': 7.5,
-  'hard-boiled': 9.5,
-};
-
-/** Boiled egg yolk descriptions */
-export const BOILED_EGG_YOLK: Record<BoiledDoneness, string> = {
-  'soft-boiled': 'Runny yolk',
-  'medium-boiled': 'Semi-solid yolk',
-  'hard-boiled': 'Fully set yolk',
-};
-
-/** Fried egg parameters — total time + flip time (null = no flip) */
-export const FRIED_EGG_PARAMS: Record<FriedDoneness, { totalTimeMin: number; firstSideMin: number; secondSideMin: number | null; notes: string }> = {
-  'sunny-side-up': { totalTimeMin: 2.5, firstSideMin: 2.5, secondSideMin: null, notes: 'No flip — cook covered' },
-  'over-easy': { totalTimeMin: 3, firstSideMin: 2, secondSideMin: 10 / 60, notes: 'Quick flip, runny yolk' },
-  'over-medium': { totalTimeMin: 4, firstSideMin: 2, secondSideMin: 2, notes: 'Flip 2 min, jammy yolk' },
-  'over-hard': { totalTimeMin: 5, firstSideMin: 2, secondSideMin: 3, notes: 'Flip 3 min, firm yolk' },
-};
-
-/** Boiled egg doneness options for the setup screen */
-export const BOILED_DONENESS_OPTIONS: DonenessOption[] = [
-  { id: 'soft-boiled', label: 'Soft', description: 'Runny yolk', imageKey: 'egg-soft-boiled' },
-  { id: 'medium-boiled', label: 'Medium', description: 'Semi-solid yolk', imageKey: 'egg-medium-boiled' },
-  { id: 'hard-boiled', label: 'Hard', description: 'Fully set yolk', imageKey: 'egg-hard-boiled' },
-];
-
-/** Fried egg doneness options for the setup screen */
-export const FRIED_DONENESS_OPTIONS: DonenessOption[] = [
-  { id: 'sunny-side-up', label: 'Sunny', description: 'No flip, runny yolk', imageKey: 'egg-sunny-side-up' },
-  { id: 'over-easy', label: 'Over Easy', description: 'Quick flip, runny yolk', imageKey: 'egg-over-easy' },
-  { id: 'over-medium', label: 'Over Med', description: 'Flip 2min, jammy yolk', imageKey: 'egg-over-medium' },
-  { id: 'over-hard', label: 'Over Hard', description: 'Flip 3min, firm yolk', imageKey: 'egg-over-hard' },
 ];
 
 // ─────────────────────────────────────────────────────────

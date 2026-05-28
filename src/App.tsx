@@ -20,8 +20,6 @@ import { useTheme } from './hooks/useTheme';
 import { Button } from './components/ui/Button';
 import { SteakSetup } from './components/steak/SteakSetup';
 import { SteakTimer } from './components/steak/SteakTimer';
-import { EggSetup } from './components/egg/EggSetup';
-import { EggTimer } from './components/egg/EggTimer';
 import { Settings } from './components/Settings';
 
 // Shared transition config for all screen changes.
@@ -127,7 +125,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* ── Food selection — separate bordered cards, same style as method picker ── */}
+        {/* ── Food selection ── */}
         <div className="flex flex-col gap-pixel-3">
           {FOOD_PLUGINS.map((plugin, i) => (
             <button
@@ -170,19 +168,13 @@ export default function App() {
     // This is the "factory" pattern — creating the right component for the job.
     if (selectedFood === 'steak') {
       content = <SteakSetup onStart={handleCookingStart} onBack={handleBackFromSetup} />;
-    } else if (selectedFood === 'egg') {
-      content = <EggSetup onStart={handleCookingStart} onBack={handleBackFromSetup} />;
     }
 
   // ─── SCREEN: Timer ───────────────────────────────────────
   } else if (screen === 'timer' && cookingPlan) {
     // 🔑 LEARNING: Same factory pattern for timer components.
     // The cookingPlan has all the data needed — we just pick the right UI.
-    if (cookingPlan.foodId === 'steak') {
-      content = <SteakTimer plan={cookingPlan} onDone={handleTimerDone} onBack={handleBackToHome} />;
-    } else if (cookingPlan.foodId === 'egg') {
-      content = <EggTimer plan={cookingPlan} onDone={handleTimerDone} onBack={handleBackToHome} />;
-    }
+    content = <SteakTimer plan={cookingPlan} onDone={handleTimerDone} onBack={handleBackToHome} />;
 
   }
 

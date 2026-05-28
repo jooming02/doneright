@@ -12,8 +12,6 @@ import type {
   FoodPlugin,
   SteakDoneness,
   SteakThickness,
-  BoiledDoneness,
-  FriedDoneness,
 } from '../types/cooking';
 
 import {
@@ -21,10 +19,6 @@ import {
   STEAK_TEMPS,
   STEAK_REST_SECONDS,
   STEAK_DONENESS_OPTIONS,
-  BOILED_EGG_TIMES,
-  FRIED_EGG_PARAMS,
-  BOILED_DONENESS_OPTIONS,
-  FRIED_DONENESS_OPTIONS,
   FOOD_PLUGINS,
 } from '../data/cooking-presets';
 
@@ -101,124 +95,12 @@ function calculateSteakTime(thickness: SteakThickness, doneness: SteakDoneness):
 }
 
 // ─────────────────────────────────────────────────────────
-// EGG CALCULATORS
+// GENERIC CALCULATOR
 // ─────────────────────────────────────────────────────────
 
-/** Calculate the cooking plan for a boiled egg */
-function calculateBoiledEggTime(doneness: BoiledDoneness): CookingPlan {
-  const minutes = BOILED_EGG_TIMES[doneness];
-  const seconds = Math.round(minutes * 60);
-
-  const phases: CookingPhase[] = [
-    {
-      id: 'boil',
-      label: 'Boiling',
-      durationSeconds: seconds,
-      type: 'cook',
-    },
-    {
-      id: 'ice-bath',
-      label: 'Ice Bath!',
-      durationSeconds: 0,
-      type: 'done',
-      alertSound: 'done',
-    },
-  ];
-
-  return {
-    foodId: 'egg',
-    foodName: 'Egg (Boiled)',
-    doneness,
-    donenessLabel: BOILED_DONENESS_OPTIONS.find((o) => o.id === doneness)?.label ?? doneness,
-    phases,
-    totalDurationSeconds: seconds,
-  };
-}
-
-/** Calculate the cooking plan for a fried egg */
-function calculateFriedEggTime(doneness: FriedDoneness): CookingPlan {
-  const params = FRIED_EGG_PARAMS[doneness];
-  const firstSideSeconds = Math.round(params.firstSideMin * 60);
-
-  const phases: CookingPhase[] = [];
-
-  // Phase 1: Cook first side
-  phases.push({
-    id: 'cook-first',
-    label: 'Cook First Side',
-    durationSeconds: firstSideSeconds,
-    type: 'cook',
-  });
-
-  // 🔑 LEARNING: Conditional phases — Not all fried eggs get flipped.
-  // Sunny-side-up has no flip phase. Over-easy/medium/hard do.
-  // The CookingPhase array encodes this logic as data, not conditionals in the UI.
-  if (params.secondSideMin !== null) {
-    const secondSideSeconds = Math.round(params.secondSideMin * 60);
-
-    phases.push({
-      id: 'flip',
-      label: 'FLIP!',
-      durationSeconds: 3,
-      type: 'flip',
-      alertSound: 'flip',
-    });
-
-    phases.push({
-      id: 'cook-second',
-      label: 'Cook Second Side',
-      durationSeconds: secondSideSeconds,
-      type: 'cook',
-    });
-  }
-
-  phases.push({
-    id: 'serve',
-    label: 'Done!',
-    durationSeconds: 0,
-    type: 'done',
-    alertSound: 'done',
-  });
-
-  const totalDuration = phases.reduce((sum, p) => sum + p.durationSeconds, 0);
-
-  return {
-    foodId: 'egg',
-    foodName: 'Egg (Fried)',
-    doneness,
-    donenessLabel: FRIED_DONENESS_OPTIONS.find((o) => o.id === doneness)?.label ?? doneness,
-    phases,
-    totalDurationSeconds: totalDuration,
-  };
-}
-
-// ─────────────────────────────────────────────────────────
-// GENERIC CALCULATOR (dispatches to food-specific ones)
-// ─────────────────────────────────────────────────────────
-
-/**
- * Main calculator — dispatches to the correct food calculator.
- *
- * 💡 CONCEPT: Dispatcher pattern — A single entry point that routes to
- * the correct implementation based on the food type. The caller doesn't
- * need to know which calculator to use; they just pass the params.
- */
+/** Main calculator — currently steak only */
 export function calculateCookingPlan(params: CookingParams): CookingPlan {
-  switch (params.food) {
-    case 'steak':
-      return calculateSteakTime(params.thickness, params.doneness);
-    case 'egg':
-      if (params.method === 'boiled') {
-        return calculateBoiledEggTime(params.doneness as BoiledDoneness);
-      }
-      return calculateFriedEggTime(params.doneness as FriedDoneness);
-    default:
-      // 🔑 LEARNING: Exhaustive check — TypeScript's `never` type ensures
-      // we handle all cases. If we add a new food and forget to add a case,
-      // this will fail at compile time.
-      const _exhaustive: never = params;
-      return _exhaustive;
-  }
+  return calculateSteakTime(params.thickness, params.doneness);
 }
 
 // ─────────────────────────────────────────────────────────
@@ -244,34 +126,9 @@ const steakPlugin: FoodPlugin = {
   },
 };
 
-/** Egg plugin implementation */
-const eggPlugin: FoodPlugin = {
-  id: 'egg',
-  name: 'Eggs',
-  icon: '🍳',
-  description: 'Boiled & fried timer',
-  getDonenessOptions: () => {
-    // Eggs need method context, so we return both sets with labels
-    return [
-      ...BOILED_DONENESS_OPTIONS.map((o) => ({ ...o, label: `Boiled: ${o.label}` })),
-      ...FRIED_DONENESS_OPTIONS.map((o) => ({ ...o, label: `Fried: ${o.label}` })),
-    ];
-  },
-  calculateTime: (params) => {
-    if (params.food !== 'egg') {
-      throw new Error('Egg plugin received non-egg params');
-    }
-    return calculateCookingPlan(params);
-  },
-};
+FOOD_PLUGINS.push(steakPlugin);
 
-// 🔑 LEARNING: Plugin registration — Mutating an imported array is a simple
-// form of the Registry pattern. More sophisticated apps would use a Map or
-// a formal DI container, but for v0 this is fine.
-FOOD_PLUGINS.push(steakPlugin, eggPlugin);
-
-// Export for direct use if needed
-export { steakPlugin, eggPlugin };
+export { steakPlugin };
 
 // ─────────────────────────────────────────────────────────
 // UTILITY: Format seconds → MM:SS
