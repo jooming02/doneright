@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface PixelProgressProps {
+interface ProgressProps {
   value: number;
   max: number;
   segments?: number;
@@ -8,7 +8,7 @@ interface PixelProgressProps {
   label?: string;
 }
 
-export const PixelProgress: React.FC<PixelProgressProps> = ({
+export const Progress: React.FC<ProgressProps> = ({
   value,
   max,
   segments = 20,

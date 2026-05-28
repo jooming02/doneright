@@ -14,8 +14,8 @@ import { AnimatePresence, motion } from 'motion/react';
 import useEmblaCarousel from 'embla-carousel-react';
 import type { SteakDoneness, SteakThickness, CookingParams } from '../../types/cooking';
 import { STEAK_THICKNESS_LABELS, STEAK_DONENESS_OPTIONS } from '../../data/cooking-presets';
-import { PixelButton } from '../ui/PixelButton';
-import { PixelDonenessPreview } from '../ui/PixelDonenessPreview';
+import { Button } from '../ui/Button';
+import { DonenessPreview } from '../ui/DonenessPreview';
 
 interface SteakSetupProps {
   onStart: (params: CookingParams) => void;
@@ -97,7 +97,7 @@ export const SteakSetup: React.FC<SteakSetupProps> = ({ onStart, onBack }) => {
     <div className="flex flex-col min-h-screen px-pixel-4 pt-pixel-4 pb-pixel-6 max-w-sm mx-auto">
       {/* Header */}
       <div className="flex items-center gap-pixel-3 mb-pixel-6">
-        <PixelButton variant="secondary" onClick={handleBack}>←</PixelButton>
+        <Button variant="ghost" onClick={handleBack}>← Back</Button>
         <h1 className="font-heading text-xl text-hi">
           🥩 {step === 'thickness' ? 'Steak' : STEAK_THICKNESS_LABELS[thickness!]}
         </h1>
@@ -108,8 +108,8 @@ export const SteakSetup: React.FC<SteakSetupProps> = ({ onStart, onBack }) => {
         {/* ─── STEP 1: Thickness ────────────────────────────── */}
         {step === 'thickness' && (
           <motion.div key="thickness" {...stepTransition} className="flex flex-col gap-pixel-2 flex-1">
-            <p className="font-pixel text-[8px] text-body-muted mb-pixel-2 tracking-widest">
-              HOW THICK IS YOUR STEAK?
+            <p className="font-heading text-base text-body-sub mb-pixel-4">
+              How thick is your steak?
             </p>
             {/* 🔑 LEARNING: flex-1 on each button + flex-col on parent = equal-height
                 buttons that fill the remaining screen. No fixed heights needed. */}
@@ -134,8 +134,8 @@ export const SteakSetup: React.FC<SteakSetupProps> = ({ onStart, onBack }) => {
         {/* ─── STEP 2: Doneness carousel ────────────────────── */}
         {step === 'doneness' && (
           <motion.div key="doneness" {...stepTransition} className="flex flex-col flex-1">
-            <p className="font-pixel text-[8px] text-body-muted mb-pixel-4 tracking-widest">
-              SWIPE TO PICK DONENESS
+            <p className="font-heading text-base text-body-sub mb-pixel-4">
+              Pick your doneness
             </p>
 
             {/* 💡 CONCEPT: Embla carousel — flex-[0_0_68%] on each slide means the
@@ -153,12 +153,12 @@ export const SteakSetup: React.FC<SteakSetupProps> = ({ onStart, onBack }) => {
                       ${i === selectedIndex ? 'opacity-100 scale-100' : 'opacity-40 scale-95'}
                     `}
                   >
-                    <PixelDonenessPreview imageKey={option.imageKey} alt={option.label} size="xl" />
+                    <DonenessPreview imageKey={option.imageKey} alt={option.label} size="xl" />
                     <div className="text-center">
-                      <div className={`font-pixel text-xs ${i === selectedIndex ? 'text-hi' : 'text-body-sub'}`}>
+                      <div className={`font-heading text-lg ${i === selectedIndex ? 'text-hi' : 'text-body-sub'}`}>
                         {option.label}
                       </div>
-                      <div className="font-pixel text-[8px] text-body-muted mt-1">{option.description}</div>
+                      <div className="font-pixel text-xs text-body-muted mt-1">{option.description}</div>
                     </div>
                   </div>
                 ))}
@@ -166,13 +166,13 @@ export const SteakSetup: React.FC<SteakSetupProps> = ({ onStart, onBack }) => {
             </div>
 
             {/* Start — centred slide is always the selection, so always enabled */}
-            <PixelButton
-              variant="success"
+            <Button
+              variant="primary"
               className="w-full py-pixel-4 text-sm mt-pixel-4"
               onClick={handleStart}
             >
               ▶ START COOKING
-            </PixelButton>
+            </Button>
           </motion.div>
         )}
 
