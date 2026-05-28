@@ -6,7 +6,9 @@
 // and Card components. The timer logic (useTimer hook) is also shared.
 // This is the power of good abstractions — write once, use everywhere.
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { toast } from 'sonner';
+import confetti from 'canvas-confetti';
 import type { CookingPlan, CookingPhase } from '../../types/cooking';
 import { useTimer } from '../../hooks/useTimer';
 import { useAudioAlert } from '../../hooks/useAudioAlert';
@@ -51,15 +53,13 @@ export const EggTimer: React.FC<EggTimerProps> = ({ plan, onDone, onBack }) => {
       audio.play(currentPhase.alertSound);
     }
 
-    // Egg-specific notifications
+    // In-app toast + background notification
     if (currentPhase?.type === 'flip') {
-      notification.notify('DoneRight — FLIP!', {
-        body: 'Time to flip your egg!',
-      });
+      toast('🔄 Time to flip!', { description: 'Turn your egg over now', duration: 6000 });
+      notification.notify('DoneRight — FLIP!', { body: 'Time to flip your egg!' });
     } else if (currentPhase?.type === 'done') {
-      notification.notify('DoneRight — Done!', {
-        body: 'Your egg is ready!',
-      });
+      toast.success('✨ Egg is ready!', { description: 'Perfect — time to serve', duration: 8000 });
+      notification.notify('DoneRight — Done!', { body: 'Your egg is ready!' });
     }
 
     const nextIndex = currentPhaseIndex + 1;
@@ -101,6 +101,18 @@ export const EggTimer: React.FC<EggTimerProps> = ({ plan, onDone, onBack }) => {
   const isInstantPhase = currentPhase && currentPhase.durationSeconds === 0;
   const isFlipPhase = currentPhase?.type === 'flip';
   const isDonePhase = currentPhase?.type === 'done';
+
+  // Celebration confetti when the done phase activates
+  useEffect(() => {
+    if (isDonePhase) {
+      confetti({
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.5 },
+        colors: ['#f5a623', '#D4901A', '#ffd700', '#e8a317', '#c17d0e'],
+      });
+    }
+  }, [isDonePhase]);
 
   // Overall progress
   const totalElapsed = plan.phases

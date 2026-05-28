@@ -18,7 +18,9 @@
 // Explicit state machines prevent impossible states (e.g., "resting" before
 // "cooking") and make the flow easy to reason about.
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { toast } from 'sonner';
+import confetti from 'canvas-confetti';
 import type { CookingPlan, CookingPhase } from '../../types/cooking';
 import { useTimer } from '../../hooks/useTimer';
 import { useAudioAlert } from '../../hooks/useAudioAlert';
@@ -80,19 +82,16 @@ export const SteakTimer: React.FC<SteakTimerProps> = ({ plan, onDone, onBack }) 
       audio.play(currentPhase.alertSound);
     }
 
-    // Show notification
+    // In-app toast + background notification
     if (currentPhase?.type === 'flip') {
-      notification.notify('DoneRight — FLIP!', {
-        body: 'Time to flip your steak!',
-      });
+      toast('🔄 Time to flip!', { description: 'Turn your steak over now', duration: 6000 });
+      notification.notify('DoneRight — FLIP!', { body: 'Time to flip your steak!' });
     } else if (currentPhase?.type === 'rest') {
-      notification.notify('DoneRight — Rest Time!', {
-        body: 'Remove from heat. Let it rest for 5 minutes.',
-      });
+      toast('🧘 Rest your steak', { description: 'Remove from heat — carryover cooking continues', duration: 6000 });
+      notification.notify('DoneRight — Rest Time!', { body: 'Remove from heat. Let it rest.' });
     } else if (currentPhase?.type === 'done') {
-      notification.notify('DoneRight — Serve!', {
-        body: 'Your steak is ready to serve!',
-      });
+      toast.success('✨ Ready to serve!', { description: 'Your steak is perfectly cooked', duration: 8000 });
+      notification.notify('DoneRight — Serve!', { body: 'Your steak is ready to serve!' });
     }
 
     // Advance to next phase
@@ -155,6 +154,18 @@ export const SteakTimer: React.FC<SteakTimerProps> = ({ plan, onDone, onBack }) 
   const isFlipPhase = currentPhase?.type === 'flip';
   const isDonePhase = currentPhase?.type === 'done';
   const isRestPhase = currentPhase?.type === 'rest';
+
+  // Celebration confetti when the done phase activates
+  useEffect(() => {
+    if (isDonePhase) {
+      confetti({
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.5 },
+        colors: ['#f5a623', '#D4901A', '#ffd700', '#e8a317', '#c17d0e'],
+      });
+    }
+  }, [isDonePhase]);
 
   return (
     <div className="flex flex-col gap-pixel-4 p-pixel-4 max-w-md mx-auto min-h-screen">

@@ -10,7 +10,9 @@
 
 import { useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import type { AppScreen, CookingPlan, CookingParams } from './types/cooking';
+import { Toaster } from 'sonner';
+import { Drawer } from 'vaul';
+  import type { AppScreen, CookingPlan, CookingParams } from './types/cooking';
 import { FOOD_PLUGINS } from './data/cooking-presets';
 import { calculateCookingPlan } from './utils/cooking-calculator';
 import { usePreferences } from './hooks/usePreferences';
@@ -47,6 +49,7 @@ export default function App() {
   const [screen, setScreen]             = useState<AppScreen>('home');
   const [selectedFood, setSelectedFood] = useState<string | null>(null);
   const [cookingPlan, setCookingPlan]   = useState<CookingPlan | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const { preferences, updatePreferences } = usePreferences();
   useTheme(preferences.themeId);
 
@@ -152,7 +155,7 @@ export default function App() {
           className="mt-auto pt-pixel-4 flex items-center justify-between animate-fade-up"
           style={{ animationDelay: '380ms' }}
         >
-          <Button variant="secondary" onClick={() => setScreen('settings')}>
+          <Button variant="secondary" onClick={() => setSettingsOpen(true)}>
             ⚙ SETTINGS
           </Button>
           <span className="font-pixel text-[8px] text-body-muted">v0.1.0</span>
@@ -181,22 +184,55 @@ export default function App() {
       content = <EggTimer plan={cookingPlan} onDone={handleTimerDone} onBack={handleBackToHome} />;
     }
 
-  // ─── SCREEN: Settings ────────────────────────────────────
-  } else if (screen === 'settings') {
-    content = (
-      <Settings
-        preferences={preferences}
-        onUpdate={updatePreferences}
-        onBack={() => setScreen('home')}
-      />
-    );
   }
 
+  // 💡 CONCEPT: Vaul drawer for Settings — instead of navigating to a separate
+  // screen, Settings slides up as a native-feeling bottom sheet. This keeps the
+  // user's context visible behind the overlay and feels more like a mobile app.
   return (
-    <AnimatePresence mode="wait">
-      <motion.div key={screen} {...SCREEN_TRANSITION}>
-        {content}
-      </motion.div>
-    </AnimatePresence>
+    <>
+      {/* Sonner toast container — sits at the root so any screen can fire toasts */}
+      <Toaster
+        position="top-center"
+        theme="dark"
+        toastOptions={{
+          style: {
+            background: 'var(--surface)',
+            border: '1px solid var(--outline)',
+            color: 'var(--body)',
+          },
+        }}
+      />
+
+      <AnimatePresence mode="wait">
+        <motion.div key={screen} {...SCREEN_TRANSITION}>
+          {content}
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Settings — Vaul bottom drawer, available from any screen */}
+      <Drawer.Root open={settingsOpen} onOpenChange={setSettingsOpen}>
+        <Drawer.Portal>
+          <Drawer.Overlay className="fixed inset-0 bg-black/50 z-40" />
+          <Drawer.Content
+            className="fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl border-t border-outline flex flex-col max-h-[88vh]"
+            style={{ background: 'var(--canvas)' }}
+          >
+            {/* Drag handle */}
+            <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
+              <div className="w-10 h-1 rounded-full" style={{ background: 'var(--outline)' }} />
+            </div>
+            {/* Scrollable area with bottom padding so last item isn't hidden */}
+            <div className="overflow-y-auto pb-10">
+              <Settings
+                preferences={preferences}
+                onUpdate={updatePreferences}
+                onBack={() => setSettingsOpen(false)}
+              />
+            </div>
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
+    </>
   );
 }
