@@ -1,34 +1,21 @@
 import React from 'react';
-import type { Preferences, TemperatureUnit, LengthUnit } from '../types/cooking';
+import type { Preferences, TemperatureUnit } from '../types/cooking';
 import { THEMES } from '../data/themes';
 import { Card } from './ui/Card';
-import { Button } from './ui/Button';
 
 interface SettingsProps {
   preferences: Preferences;
   onUpdate: (update: Partial<Preferences>) => void;
-  onBack: () => void;
 }
 
-export const Settings: React.FC<SettingsProps> = ({ preferences, onUpdate, onBack }) => {
+export const Settings: React.FC<SettingsProps> = ({ preferences, onUpdate }) => {
   const tempOptions: { value: TemperatureUnit; label: string }[] = [
     { value: 'fahrenheit', label: '°F' },
     { value: 'celsius',    label: '°C' },
   ];
 
-  const lengthOptions: { value: LengthUnit; label: string }[] = [
-    { value: 'inch', label: 'inch' },
-    { value: 'cm',   label: 'cm'   },
-  ];
-
   return (
     <div className="flex flex-col gap-pixel-4 p-pixel-4 max-w-md mx-auto">
-      {/* Header */}
-      <div className="flex items-center gap-pixel-3">
-        <Button variant="secondary" onClick={onBack}>←</Button>
-        <h1 className="font-heading text-xl text-hi">⚙ Settings</h1>
-      </div>
-
       {/* Theme picker */}
       <Card title="THEME">
         <div className="grid grid-cols-2 gap-pixel-2">
@@ -88,29 +75,6 @@ export const Settings: React.FC<SettingsProps> = ({ preferences, onUpdate, onBac
               `}
               onClick={() => onUpdate({ temperatureUnit: opt.value })}
               aria-pressed={preferences.temperatureUnit === opt.value}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </Card>
-
-      {/* Length unit */}
-      <Card title="LENGTH">
-        <div className="flex gap-pixel-2">
-          {lengthOptions.map((opt) => (
-            <button
-              key={opt.value}
-              className={`
-                flex-1 font-pixel text-xs px-pixel-4 py-pixel-3
-                border border-solid rounded-md transition-all duration-150
-                ${preferences.lengthUnit === opt.value
-                  ? 'border-hi bg-panel text-hi'
-                  : 'border-outline bg-canvas text-body-sub hover:border-hi/50'
-                }
-              `}
-              onClick={() => onUpdate({ lengthUnit: opt.value })}
-              aria-pressed={preferences.lengthUnit === opt.value}
             >
               {opt.label}
             </button>

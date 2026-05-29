@@ -29,45 +29,28 @@ import {
 /**
  * Calculate the full cooking plan for a steak.
  *
- * 💡 CONCEPT: Phased cooking plan — A steak has 3 phases:
- * 1. Cook first side
- * 2. Flip and cook second side
- * 3. Rest (carryover cooking continues)
+ * 💡 CONCEPT: Continuous two-stage plan — Rather than splitting the cook into
+ * separate "side 1 / flip / side 2" phases that each halt the timer, we run one
+ * continuous "Cooking" phase covering both sides. A flip reminder fires via toast
+ * at the halfway point while the timer keeps running. Then a "Cooling" rest phase.
  *
- * Each phase has a duration, label, and optional alert sound.
- * The timer component advances through phases sequentially.
+ *   e.g. 1 min/side → 2 min cooking (flip at the 1 min mark) + 5 min cooling.
  */
 function calculateSteakTime(thickness: SteakThickness, doneness: SteakDoneness): CookingPlan {
   const minutesPerSide = STEAK_TIMES[thickness][doneness];
   const secondsPerSide = Math.round(minutesPerSide * 60);
 
-  // 🔑 LEARNING: Building phases as an array of objects.
-  // This is the "command pattern" — each phase is a command that the
-  // timer executes sequentially. The timer doesn't know about steak;
-  // it just knows about phases.
   const phases: CookingPhase[] = [
     {
-      id: 'cook-side-1',
-      label: 'Cook Side 1',
-      durationSeconds: secondsPerSide,
+      id: 'cook',
+      label: 'Cooking',
+      durationSeconds: secondsPerSide * 2, // both sides, one continuous timer
       type: 'cook',
-    },
-    {
-      id: 'flip',
-      label: 'FLIP!',
-      durationSeconds: 3, // 3 seconds to flip — just enough time to see the alert
-      type: 'flip',
-      alertSound: 'flip',
-    },
-    {
-      id: 'cook-side-2',
-      label: 'Cook Side 2',
-      durationSeconds: secondsPerSide,
-      type: 'cook',
+      flipAtSeconds: secondsPerSide, // remind to flip when this many seconds remain
     },
     {
       id: 'rest',
-      label: 'Rest',
+      label: 'Cooling',
       durationSeconds: STEAK_REST_SECONDS,
       type: 'rest',
       alertSound: 'done',

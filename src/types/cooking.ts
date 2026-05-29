@@ -18,12 +18,10 @@ export type SteakThickness = '0.5in' | '0.75in' | '1in' | '1.5in' | '2in';
 // 💡 CONCEPT: Unit preferences — storing user preferences in a typed object
 // prevents mixing °C with cm or °F with inch. The type system enforces consistency.
 export type TemperatureUnit = 'celsius' | 'fahrenheit';
-export type LengthUnit = 'cm' | 'inch';
 
 /** User preferences persisted to localStorage */
 export interface Preferences {
   temperatureUnit: TemperatureUnit;
-  lengthUnit: LengthUnit;
   themeId: string;
 }
 
@@ -43,13 +41,16 @@ export interface TemperatureRange {
   finalTempC: number; // Final resting temp in Celsius
 }
 
-/** A single phase of cooking (e.g., "cook side 1", "flip", "rest") */
+/** A single phase of cooking (e.g., "cooking", "cooling") */
 export interface CookingPhase {
   id: string;
   label: string;
   durationSeconds: number;
-  type: 'cook' | 'flip' | 'rest' | 'done';
+  type: 'cook' | 'rest' | 'done';
   alertSound?: 'flip' | 'done' | 'rest-done'; // Which sound to play at phase end
+  /** Seconds-remaining threshold at which to fire a "flip now" reminder
+   *  (timer keeps running — no phase split). Only set on the cook phase. */
+  flipAtSeconds?: number;
 }
 
 /** The complete cooking plan returned by the calculator */

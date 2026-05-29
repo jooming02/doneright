@@ -21,7 +21,7 @@ import type {
 
 /** Time per side in minutes, indexed by thickness × doneness */
 export const STEAK_TIMES: Record<SteakThickness, Record<SteakDoneness, number>> = {
-  '0.5in': { rare: 1, 'medium-rare': 2, medium: 3, 'medium-well': 4, 'well-done': 5 },
+  '0.5in': { rare: 1/10, 'medium-rare': 2, medium: 3, 'medium-well': 4, 'well-done': 5 },
   '0.75in': { rare: 2, 'medium-rare': 3, medium: 4, 'medium-well': 5, 'well-done': 6 },
   '1in': { rare: 3, 'medium-rare': 4, medium: 5, 'medium-well': 6, 'well-done': 7.5 },
   '1.5in': { rare: 4, 'medium-rare': 5, medium: 6, 'medium-well': 7.5, 'well-done': 9.5 },
@@ -63,7 +63,8 @@ export const STEAK_TEMPS: Record<SteakDoneness, TemperatureRange> = {
 };
 
 /** Steak rest time in seconds — all doneness levels */
-export const STEAK_REST_SECONDS = 5 * 60;
+// export const STEAK_REST_SECONDS = 5 * 60;
+export const STEAK_REST_SECONDS = 10;
 
 /** Display labels for steak thickness options */
 export const STEAK_THICKNESS_LABELS: Record<SteakThickness, string> = {
