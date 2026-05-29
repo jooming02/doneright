@@ -1,60 +1,51 @@
-// 🔑 LEARNING: Steak Setup — Configuration screen where the user picks
-// thickness and doneness before starting the timer. This screen demonstrates:
-//
-// 1. Controlled components — React state drives the form values
-// 2. Step-based navigation — Thickness first, then doneness, each on its own screen
-// 3. Derived data — The cooking plan is calculated from selections before starting
-//
-// 💡 CONCEPT: "Setup" pattern — Many timer apps jump straight to a timer with
-// default values. We use a setup screen because cooking is NOT forgiving —
-// you can't un-cook a steak. The setup screen forces intentional choices.
+// 🔑 LEARNING: Steak Setup — One screen does everything. The user picks a
+// doneness (swipe or tap a pill), then START turns this same page dynamic:
+// the steak image becomes a sizzling pan and the static time becomes a live
+// countdown. No second "timer page" — the cooking state machine lives in the
+// useSteakCook hook and we just overlay the running UI on top of the picker.
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { Drawer } from 'vaul';
 import useEmblaCarousel from 'embla-carousel-react';
-import type { SteakDoneness, SteakThickness, CookingParams } from '../../types/cooking';
-import { STEAK_THICKNESS_LABELS, STEAK_DONENESS_OPTIONS } from '../../data/cooking-presets';
+import type { SteakDoneness, SteakThickness } from '../../types/cooking';
+import {
+  STEAK_DONENESS_OPTIONS,
+  STEAK_THICKNESS_LABELS,
+  STEAK_TIMES,
+  STEAK_REST_SECONDS,
+} from '../../data/cooking-presets';
+import { calculateCookingPlan, formatTime } from '../../utils/cooking-calculator';
+import { useSteakCook } from '../../hooks/useSteakCook';
 import { Button } from '../ui/Button';
 import { DonenessPreview } from '../ui/DonenessPreview';
 
 interface SteakSetupProps {
-  onStart: (params: CookingParams) => void;
-  onBack: () => void;
+  onOpenSettings: () => void;
 }
 
-// 🔑 LEARNING: All possible thickness values as an array — We need this
-// for mapping over in the UI. TypeScript's Record type gives us type safety,
-// but we still need a runtime array for iteration.
 const THICKNESS_OPTIONS: SteakThickness[] = ['0.5in', '0.75in', '1in', '1.5in', '2in'];
+const DEFAULT_INDEX = 1; // medium-rare
 
-type Step = 'thickness' | 'doneness';
+export const SteakSetup: React.FC<SteakSetupProps> = ({ onOpenSettings }) => {
+  const [thickness, setThickness] = useState<SteakThickness>('0.5in');
+  const [thicknessOpen, setThicknessOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(DEFAULT_INDEX);
 
-/**
- * SteakSetup — Choose thickness (tap to advance), then pick doneness from a carousel.
- *
- * 💡 CONCEPT: Step-based flow (no scrolling) —
- * Tapping a thickness auto-advances to the doneness step — no separate "Next" button.
- * The doneness carousel keeps the selected item centred; swipe to change.
- * Back within the flow goes to the previous step, not all the way home.
- */
-export const SteakSetup: React.FC<SteakSetupProps> = ({ onStart, onBack }) => {
-  const [step, setStep] = useState<Step>('thickness');
-  const [thickness, setThickness] = useState<SteakThickness | null>(null);
+  const cook = useSteakCook();
+  const isIdle = cook.status === 'idle';
 
-  // 🔑 LEARNING: direction controls which axis the step animation slides along.
-  // 1 = going forward (enters from right), -1 = going back (enters from left).
-  const [direction, setDirection] = useState<1 | -1>(1);
+  // 💡 CONCEPT: startIndex makes embla open on medium-rare rather than rare.
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,
+    align: 'center',
+    startIndex: DEFAULT_INDEX,
+  });
 
-  // 💡 CONCEPT: Embla carousel — an external library handles swipe/touch/snap
-  // mechanics so we don't hand-roll that logic. align:'center' keeps the active
-  // slide centred; loop:false stops naturally at the ends.
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'center' });
-  const [selectedIndex, setSelectedIndex] = useState(0);
-
-  // 🔑 LEARNING: Syncing React state with Embla's internal state via its event
-  // system. 'select' fires every time the centred slide changes.
+  // 🔑 LEARNING: Bidirectional sync — carousel drives pill highlight,
+  // pill click drives carousel scroll. Both update selectedIndex.
   const onEmblaSelect = useCallback(() => {
-    if (emblaApi) setSelectedIndex(emblaApi.selectedScrollSnap());
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
   }, [emblaApi]);
 
   useEffect(() => {
@@ -63,120 +54,248 @@ export const SteakSetup: React.FC<SteakSetupProps> = ({ onStart, onBack }) => {
     return () => { emblaApi.off('select', onEmblaSelect); };
   }, [emblaApi, onEmblaSelect]);
 
-  const handleThicknessSelect = (t: SteakThickness) => {
-    setThickness(t);
-    setDirection(1);
-    setStep('doneness');
-  };
+  const scrollTo = useCallback((index: number) => {
+    emblaApi?.scrollTo(index);
+  }, [emblaApi]);
 
-  const handleBack = () => {
-    if (step === 'doneness') {
-      setDirection(-1);
-      setStep('thickness');
-    } else {
-      onBack();
-    }
-  };
+  const selectedOption = STEAK_DONENESS_OPTIONS[selectedIndex]!;
+  const doneness = selectedOption.id as SteakDoneness;
+
+  // Derived: total cook time updates live as doneness / thickness changes
+  const minutesPerSide = STEAK_TIMES[thickness][doneness];
+  const totalSeconds = Math.round(minutesPerSide * 60) * 2 + STEAK_REST_SECONDS;
 
   const handleStart = () => {
-    if (!thickness) return;
-    const doneness = STEAK_DONENESS_OPTIONS[selectedIndex]?.id as SteakDoneness;
-    onStart({ food: 'steak', thickness, doneness });
-  };
-
-  // Step transitions slide horizontally — distinct from App's vertical screen transitions.
-  // direction drives the sign so forward slides right→left and back slides left→right.
-  const stepTransition = {
-    initial:    { opacity: 0, x: direction * 30 },
-    animate:    { opacity: 1, x: 0 },
-    exit:       { opacity: 0, x: direction * -30 },
-    transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] as const },
+    cook.start(calculateCookingPlan({ food: 'steak', thickness, doneness }));
   };
 
   return (
-    <div className="flex flex-col min-h-screen px-pixel-4 pt-pixel-4 pb-pixel-6 max-w-sm mx-auto">
-      {/* Header */}
-      <div className="flex items-center gap-pixel-3 mb-pixel-6">
-        <Button variant="ghost" onClick={handleBack}>← Back</Button>
-        <h1 className="font-heading text-xl text-hi">
-          🥩 {step === 'thickness' ? 'Steak' : STEAK_THICKNESS_LABELS[thickness!]}
-        </h1>
+    <div className="relative flex flex-col min-h-screen max-w-sm mx-auto">
+
+      {/* ── Top bar ── */}
+      <div className="flex items-center justify-between px-pixel-4 pt-pixel-4 pb-pixel-2">
+        <button
+          onClick={onOpenSettings}
+          className="text-body-muted hover:text-body transition-colors p-2 -ml-2"
+          aria-label="Open menu"
+        >
+          <span className="text-2xl leading-none">≡</span>
+        </button>
+        <span className="font-pixel text-xs text-body-muted">{STEAK_THICKNESS_LABELS[thickness]}</span>
       </div>
 
-      <AnimatePresence mode="wait">
+      {/* ── Pill nav — always exactly 3 visible, equal width columns.
+          A sliding window (prev / selected / next) shifts as the carousel
+          changes, so there's always a pill on each side to hint direction. */}
+      {(() => {
+        const winStart = Math.max(0, Math.min(selectedIndex - 1, STEAK_DONENESS_OPTIONS.length - 3));
+        const visible = STEAK_DONENESS_OPTIONS.slice(winStart, winStart + 3);
+        return (
+          <div className="grid grid-cols-3 gap-pixel-2 px-pixel-4 pb-pixel-3">
+            {visible.map((opt) => {
+              const realIdx = STEAK_DONENESS_OPTIONS.findIndex(o => o.id === opt.id);
+              return (
+                <button
+                  key={opt.id}
+                  onClick={() => scrollTo(realIdx)}
+                  className={`
+                    py-pixel-2 rounded-full
+                    font-pixel text-sm border border-solid transition-all duration-150
+                    ${realIdx === selectedIndex
+                      ? 'bg-cta text-cta-ink border-cta'
+                      : 'bg-surface text-body-sub border-outline hover:border-hi/50'
+                    }
+                  `}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+        );
+      })()}
 
-        {/* ─── STEP 1: Thickness ────────────────────────────── */}
-        {step === 'thickness' && (
-          <motion.div key="thickness" {...stepTransition} className="flex flex-col gap-pixel-2 flex-1">
-            <p className="font-heading text-base text-body-sub mb-pixel-4">
-              How thick is your steak?
-            </p>
-            {/* 🔑 LEARNING: flex-1 on each button + flex-col on parent = equal-height
-                buttons that fill the remaining screen. No fixed heights needed. */}
-            {THICKNESS_OPTIONS.map((t) => (
-              <button
-                key={t}
-                onClick={() => handleThicknessSelect(t)}
-                className="
-                  flex-1 text-left px-pixel-4
-                  border border-solid border-outline rounded-lg
-                  bg-surface hover:border-hi hover:bg-panel
-                  transition-all duration-150
-                  font-pixel text-[10px] text-body-sub hover:text-hi
-                "
-              >
-                {STEAK_THICKNESS_LABELS[t]}
-              </button>
-            ))}
-          </motion.div>
-        )}
-
-        {/* ─── STEP 2: Doneness carousel ────────────────────── */}
-        {step === 'doneness' && (
-          <motion.div key="doneness" {...stepTransition} className="flex flex-col flex-1">
-            <p className="font-heading text-base text-body-sub mb-pixel-4">
-              Pick your doneness
-            </p>
-
-            {/* 💡 CONCEPT: Embla carousel — flex-[0_0_68%] on each slide means the
-                active slide takes 68% of the container width, with ~16% of the
-                adjacent slides peeking from each side. This naturally hints
-                "there is more to swipe" without any extra UI chrome. */}
-            <div className="overflow-hidden flex-1 flex flex-col justify-center" ref={emblaRef}>
-              <div className="flex">
-                {STEAK_DONENESS_OPTIONS.map((option, i) => (
-                  <div
-                    key={option.id}
-                    className={`
-                      flex-[0_0_68%] flex flex-col items-center gap-pixel-3 px-pixel-2
-                      transition-all duration-300
-                      ${i === selectedIndex ? 'opacity-100 scale-100' : 'opacity-40 scale-95'}
-                    `}
-                  >
-                    <DonenessPreview imageKey={option.imageKey} alt={option.label} size="xl" />
-                    <div className="text-center">
-                      <div className={`font-heading text-lg ${i === selectedIndex ? 'text-hi' : 'text-body-sub'}`}>
-                        {option.label}
-                      </div>
-                      <div className="font-pixel text-xs text-body-muted mt-1">{option.description}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Start — centred slide is always the selection, so always enabled */}
-            <Button
-              variant="primary"
-              className="w-full py-pixel-4 text-sm mt-pixel-4"
-              onClick={handleStart}
+      {/* ── Doneness carousel — vertically centred in available space ── */}
+      <div className="flex-1 flex flex-col justify-center overflow-hidden" ref={emblaRef}>
+        <div className="flex">
+          {STEAK_DONENESS_OPTIONS.map((option, i) => (
+            <div
+              key={option.id}
+              className={`
+                flex-[0_0_65%] flex flex-col items-center px-pixel-2
+                transition-all duration-300
+                ${i === selectedIndex ? 'opacity-100 scale-100' : 'opacity-35 scale-90'}
+              `}
             >
-              ▶ START COOKING
-            </Button>
-          </motion.div>
-        )}
+              <DonenessPreview imageKey={option.imageKey} alt={option.label} size="xl" />
+            </div>
+          ))}
+        </div>
+      </div>
 
-      </AnimatePresence>
+      {/* ── Time display — beneath the image, prominent ── */}
+      <div className="flex flex-col items-center py-pixel-4 gap-1">
+        <span
+          className="font-heading text-hi leading-none"
+          style={{ fontSize: 'clamp(2.5rem, 12vw, 3.5rem)' }}
+        >
+          {formatTime(totalSeconds)}
+        </span>
+        <span className="font-pixel text-[9px] text-body-muted tracking-widest uppercase">total time</span>
+      </div>
+
+      {/* ── Bottom: START + thickness trigger ── */}
+      <div className="mt-auto px-pixel-4 pb-pixel-6 flex flex-col gap-pixel-3">
+        <Button variant="primary" className="w-full" onClick={handleStart}>
+          START
+        </Button>
+        <button
+          onClick={() => setThicknessOpen(true)}
+          className="text-center font-pixel text-xs text-body-muted py-1 hover:text-body-sub transition-colors"
+        >
+          ↑ {STEAK_THICKNESS_LABELS[thickness]} · tap to change thickness
+        </button>
+      </div>
+
+      {/* ── Thickness bottom drawer ── */}
+      <Drawer.Root open={thicknessOpen} onOpenChange={setThicknessOpen}>
+        <Drawer.Portal>
+          <Drawer.Overlay className="fixed inset-0 bg-black/50 z-40" />
+          <Drawer.Content
+            className="fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl border-t border-outline pb-8"
+            style={{ background: 'var(--canvas)' }}
+          >
+            <div className="flex justify-center pt-3 pb-3">
+              <div className="w-10 h-1 rounded-full" style={{ background: 'var(--outline)' }} />
+            </div>
+            <p className="font-pixel text-xs text-body-muted text-center mb-pixel-3">STEAK THICKNESS</p>
+            <div className="flex flex-col gap-pixel-2 px-pixel-4">
+              {THICKNESS_OPTIONS.map(t => (
+                <button
+                  key={t}
+                  onClick={() => { setThickness(t); setThicknessOpen(false); }}
+                  className={`
+                    px-pixel-4 py-pixel-3 rounded-lg border border-solid
+                    font-pixel text-xs transition-all duration-150 flex items-center justify-between
+                    ${thickness === t
+                      ? 'border-hi bg-panel text-hi'
+                      : 'border-outline bg-surface text-body-sub hover:border-hi/50'
+                    }
+                  `}
+                >
+                  <span>{STEAK_THICKNESS_LABELS[t]}</span>
+                  {thickness === t && <span>✓</span>}
+                </button>
+              ))}
+            </div>
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
+
+      {/* ── Running / Done overlay ──────────────────────────────
+          💡 CONCEPT: Overlay instead of a new page — sits on top of the picker
+          so the carousel underneath keeps its state. The same layout language
+          (menu top, big image centre, big time below) carries over for a
+          seamless "the page came alive" feel. */}
+      {!isIdle && (
+        <div
+          className="absolute inset-0 z-30 flex flex-col px-pixel-4 pb-pixel-6"
+          style={{ background: 'var(--canvas)' }}
+        >
+          {/* Top bar mirrors the idle one */}
+          <div className="flex items-center justify-between pt-pixel-4 pb-pixel-2 -mx-pixel-4 px-pixel-4">
+            <button
+              onClick={onOpenSettings}
+              className="text-body-muted hover:text-body transition-colors p-2 -ml-2"
+              aria-label="Open menu"
+            >
+              <span className="text-2xl leading-none">≡</span>
+            </button>
+            <span className="font-pixel text-xs text-body-muted">
+              {selectedOption.label} · {STEAK_THICKNESS_LABELS[thickness]}
+            </span>
+          </div>
+
+          {/* Centre: sizzling pan only while actively cooking; otherwise the
+              plated doneness result (resting, cooling, or done). */}
+          <div className="flex-1 flex flex-col items-center justify-center gap-pixel-4">
+            {cook.currentType === 'cook' && cook.status === 'cooking' ? (
+              <img
+                src="/images/steak-cooking.png"
+                alt="Steak cooking"
+                className="w-56 h-56 object-contain animate-sizzle"
+              />
+            ) : (
+              <DonenessPreview imageKey={selectedOption.imageKey} alt={selectedOption.label} size="xl" />
+            )}
+            {cook.status === 'done' && (
+              <div className="text-center">
+                <p className="font-heading text-3xl text-timer-ok">Ready to serve!</p>
+                <p className="font-pixel text-xs text-body-muted mt-1">Your {selectedOption.label.toLowerCase()} steak is done</p>
+              </div>
+            )}
+          </div>
+
+          {/* Big segment time + current stage */}
+          {cook.status !== 'done' && (
+            <div className="flex flex-col items-center py-pixel-4 gap-1">
+              <span
+                className="font-heading text-hi leading-none tabular-nums"
+                style={{ fontSize: 'clamp(2.5rem, 12vw, 3.5rem)' }}
+              >
+                {formatTime(cook.remaining)}
+              </span>
+              <span className="font-pixel text-[9px] text-body-muted tracking-widest uppercase">
+                {cook.isPaused
+                  ? 'paused'
+                  : cook.status === 'awaiting'
+                    ? `next · ${cook.stageLabel}`
+                    : cook.stageLabel}
+              </span>
+            </div>
+          )}
+
+          {/* Controls */}
+          <div className="flex flex-col gap-pixel-2">
+            {cook.status === 'done' ? (
+              <Button variant="primary" className="w-full" onClick={cook.reset}>
+                DONE
+              </Button>
+            ) : cook.status === 'awaiting' ? (
+              // Cooking finished — timer stopped, user starts the next segment.
+              <>
+                <Button variant="primary" className="w-full" onClick={cook.startNext}>
+                  ▶ START {cook.stageLabel.toUpperCase()} ({formatTime(cook.remaining)})
+                </Button>
+                <button
+                  onClick={cook.reset}
+                  className="text-center font-pixel text-xs text-body-muted py-1 hover:text-body-sub transition-colors"
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <>
+                {cook.isPaused ? (
+                  <Button variant="primary" className="w-full" onClick={cook.resume}>
+                    ▶ RESUME
+                  </Button>
+                ) : (
+                  <Button variant="secondary" className="w-full" onClick={cook.pause}>
+                    ⏸ PAUSE
+                  </Button>
+                )}
+                <button
+                  onClick={cook.reset}
+                  className="text-center font-pixel text-xs text-body-muted py-1 hover:text-body-sub transition-colors"
+                >
+                  Cancel
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

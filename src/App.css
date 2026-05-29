@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide scrollbar while keeping scroll functionality */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Sizzle — makes the cooking steak feel hot and alive (gif-like).
+   Two layered animations: a slow "breathing" bob + a faster pulsing heat glow. */
+@keyframes sizzle-bob {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-4px) scale(1.025); }
+}
+@keyframes sizzle-glow {
+  0%, 100% { filter: drop-shadow(0 6px 12px color-mix(in srgb, var(--hi) 22%, transparent)); }
+  50%      { filter: drop-shadow(0 12px 26px color-mix(in srgb, var(--cta) 50%, transparent)); }
+}
+.animate-sizzle {
+  animation:
+    sizzle-bob 1.8s ease-in-out infinite,
+    sizzle-glow 0.85s ease-in-out infinite;
+  will-change: transform, filter;
+}
+
 /* ─────────────────────────────────────────────────────────
    THEME VARIABLES — defaults (Sunset Boulevard)
    Overwritten at runtime by useTheme hook.

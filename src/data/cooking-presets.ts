@@ -6,8 +6,6 @@
 import type {
   SteakDoneness,
   SteakThickness,
-  BoiledDoneness,
-  FriedDoneness,
   DonenessOption,
   TemperatureRange,
   FoodPlugin,
@@ -23,7 +21,7 @@ import type {
 
 /** Time per side in minutes, indexed by thickness × doneness */
 export const STEAK_TIMES: Record<SteakThickness, Record<SteakDoneness, number>> = {
-  '0.5in': { rare: 1, 'medium-rare': 2, medium: 3, 'medium-well': 4, 'well-done': 5 },
+  '0.5in': { rare: 1/10, 'medium-rare': 2, medium: 3, 'medium-well': 4, 'well-done': 5 },
   '0.75in': { rare: 2, 'medium-rare': 3, medium: 4, 'medium-well': 5, 'well-done': 6 },
   '1in': { rare: 3, 'medium-rare': 4, medium: 5, 'medium-well': 6, 'well-done': 7.5 },
   '1.5in': { rare: 4, 'medium-rare': 5, medium: 6, 'medium-well': 7.5, 'well-done': 9.5 },
@@ -65,7 +63,8 @@ export const STEAK_TEMPS: Record<SteakDoneness, TemperatureRange> = {
 };
 
 /** Steak rest time in seconds — all doneness levels */
-export const STEAK_REST_SECONDS = 5 * 60;
+// export const STEAK_REST_SECONDS = 5 * 60;
+export const STEAK_REST_SECONDS = 10;
 
 /** Display labels for steak thickness options */
 export const STEAK_THICKNESS_LABELS: Record<SteakThickness, string> = {
@@ -83,47 +82,6 @@ export const STEAK_DONENESS_OPTIONS: DonenessOption[] = [
   { id: 'medium', label: 'Medium', description: 'Pink center, firm', imageKey: 'steak-medium' },
   { id: 'medium-well', label: 'Med Well', description: 'Slight pink, mostly brown', imageKey: 'steak-medium-well' },
   { id: 'well-done', label: 'Well Done', description: 'Fully brown throughout', imageKey: 'steak-well-done' },
-];
-
-// ─────────────────────────────────────────────────────────
-// EGG DATA
-// ─────────────────────────────────────────────────────────
-
-/** Boiled egg cook times in minutes from boiling water */
-export const BOILED_EGG_TIMES: Record<BoiledDoneness, number> = {
-  'soft-boiled': 6,
-  'medium-boiled': 7.5,
-  'hard-boiled': 9.5,
-};
-
-/** Boiled egg yolk descriptions */
-export const BOILED_EGG_YOLK: Record<BoiledDoneness, string> = {
-  'soft-boiled': 'Runny yolk',
-  'medium-boiled': 'Semi-solid yolk',
-  'hard-boiled': 'Fully set yolk',
-};
-
-/** Fried egg parameters — total time + flip time (null = no flip) */
-export const FRIED_EGG_PARAMS: Record<FriedDoneness, { totalTimeMin: number; firstSideMin: number; secondSideMin: number | null; notes: string }> = {
-  'sunny-side-up': { totalTimeMin: 2.5, firstSideMin: 2.5, secondSideMin: null, notes: 'No flip — cook covered' },
-  'over-easy': { totalTimeMin: 3, firstSideMin: 2, secondSideMin: 10 / 60, notes: 'Quick flip, runny yolk' },
-  'over-medium': { totalTimeMin: 4, firstSideMin: 2, secondSideMin: 2, notes: 'Flip 2 min, jammy yolk' },
-  'over-hard': { totalTimeMin: 5, firstSideMin: 2, secondSideMin: 3, notes: 'Flip 3 min, firm yolk' },
-};
-
-/** Boiled egg doneness options for the setup screen */
-export const BOILED_DONENESS_OPTIONS: DonenessOption[] = [
-  { id: 'soft-boiled', label: 'Soft', description: 'Runny yolk', imageKey: 'egg-soft-boiled' },
-  { id: 'medium-boiled', label: 'Medium', description: 'Semi-solid yolk', imageKey: 'egg-medium-boiled' },
-  { id: 'hard-boiled', label: 'Hard', description: 'Fully set yolk', imageKey: 'egg-hard-boiled' },
-];
-
-/** Fried egg doneness options for the setup screen */
-export const FRIED_DONENESS_OPTIONS: DonenessOption[] = [
-  { id: 'sunny-side-up', label: 'Sunny', description: 'No flip, runny yolk', imageKey: 'egg-sunny-side-up' },
-  { id: 'over-easy', label: 'Over Easy', description: 'Quick flip, runny yolk', imageKey: 'egg-over-easy' },
-  { id: 'over-medium', label: 'Over Med', description: 'Flip 2min, jammy yolk', imageKey: 'egg-over-medium' },
-  { id: 'over-hard', label: 'Over Hard', description: 'Flip 3min, firm yolk', imageKey: 'egg-over-hard' },
 ];
 
 // ─────────────────────────────────────────────────────────
