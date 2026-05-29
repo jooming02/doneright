@@ -52,6 +52,8 @@ export default defineConfig({
 
       // manifest: PWA metadata — This is what the browser uses to show the
       // install prompt and app icon on the home screen.
+      // 🔑 LEARNING: Icon paths must exist on disk. Chrome on Android will
+      // silently fail "Add to Home Screen" if any icon URL 404s.
       manifest: {
         name: 'DoneRight — Cooking Timer',
         short_name: 'DoneRight',
@@ -62,8 +64,8 @@ export default defineConfig({
         orientation: 'portrait',
         start_url: '/',
         icons: [
-          { src: '/images/icon-192.svg', sizes: '192x192', type: 'image/svg+xml' },
-          { src: '/images/icon-512.svg', sizes: '512x512', type: 'image/svg+xml' },
+          { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
         ],
       },
     }),
