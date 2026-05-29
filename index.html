@@ -23,8 +23,10 @@
       rel="stylesheet"
     />
 
-    <!-- 💡 CONCEPT: PWA manifest link — Tells the browser this is an installable web app -->
-    <link rel="manifest" href="/manifest.json" />
+    <!-- 💡 CONCEPT: PWA manifest link — vite-plugin-pwa auto-injects the
+         <link rel="manifest" href="/manifest.webmanifest"> tag at build time.
+         Don't add a second one here — having two competing manifests confuses
+         the browser and breaks "Add to Home Screen" on Android Chrome. -->
   </head>
   <body>
     <div id="root"></div>
